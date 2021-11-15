@@ -1,71 +1,61 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
-  file: ./schema.graphql
+    file: ./schema.graphql
 dataSources:
-  - kind: ethereum/contract
-    name: cDAI
-    network: mainnet
-    source:
-      address: "0x5d3a536e4d6dbd6114cc1ead35777bab948e3643"
-      abi: cDAI
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - AccrueInterest
-        - Approval
-        - Borrow
-        - Failure
-        - LiquidateBorrow
-        - Mint
-        - NewAdmin
-        - NewComptroller
-        - NewImplementation
-        - NewMarketInterestRateModel
-        - NewPendingAdmin
-        - NewReserveFactor
-        - Redeem
-        - RepayBorrow
-        - ReservesAdded
-        - ReservesReduced
-        - Transfer
-      abis:
-        - name: cDAI
-          file: ./abis/cDAI.json
-      eventHandlers:
-        - event: AccrueInterest(uint256,uint256,uint256,uint256)
-          handler: handleAccrueInterest
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: Borrow(address,uint256,uint256,uint256)
-          handler: handleBorrow
-        - event: Failure(uint256,uint256,uint256)
-          handler: handleFailure
-        - event: LiquidateBorrow(address,address,uint256,address,uint256)
-          handler: handleLiquidateBorrow
-        - event: Mint(address,uint256,uint256)
-          handler: handleMint
-        - event: NewAdmin(address,address)
-          handler: handleNewAdmin
-        - event: NewComptroller(address,address)
-          handler: handleNewComptroller
-        - event: NewImplementation(address,address)
-          handler: handleNewImplementation
-        - event: NewMarketInterestRateModel(address,address)
-          handler: handleNewMarketInterestRateModel
-        - event: NewPendingAdmin(address,address)
-          handler: handleNewPendingAdmin
-        - event: NewReserveFactor(uint256,uint256)
-          handler: handleNewReserveFactor
-        - event: Redeem(address,uint256,uint256)
-          handler: handleRedeem
-        - event: RepayBorrow(address,address,uint256,uint256,uint256)
-          handler: handleRepayBorrow
-        - event: ReservesAdded(address,uint256,uint256)
-          handler: handleReservesAdded
-        - event: ReservesReduced(address,uint256,uint256)
-          handler: handleReservesReduced
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-      file: ./src/mapping.ts
+    - kind: ethereum/contract
+      name: Comptroller
+      network: mainnet
+      source:
+          address: "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
+          abi: comptroller
+          startBlock: 12069860
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mapping/comptroller.ts
+          entities:
+              - Market
+          abis:
+              - name: CToken
+                file: ./abis/ctoken.json
+              - name: comptroller
+                file: ./abis/comptroller.json
+              - name: ERC20
+                file: ./abis/erc20.json
+          eventHandlers:
+              - event: MarketListed(address)
+                handler: handleMarketListed
+templates:
+    - name: CToken
+      kind: ethereum/contract
+      network: mainnet
+      source:
+          abi: CToken
+      mapping:
+          kind: ethereum/events
+          apiVersion: 0.0.5
+          language: wasm/assemblyscript
+          file: ./src/mapping/ctoken.ts
+          entities:
+              - Market
+          abis:
+              - name: CToken
+                file: ./abis/ctoken.json
+              - name: ERC20
+                file: ./abis/erc20.json
+          eventHandlers:
+              - event: Mint(address,uint256,uint256)
+                handler: handleMint
+              - event: Redeem(address,uint256,uint256)
+                handler: handleRedeem
+              - event: Borrow(address,uint256,uint256,uint256)
+                handler: handleBorrow
+              - event: RepayBorrow(address,address,uint256,uint256,uint256)
+                handler: handleRepayBorrow
+              - event: LiquidateBorrow(address,address,uint256,address,uint256)
+                handler: handleLiquidateBorrow
+              - event: AccrueInterest(uint256,uint256,uint256,uint256)
+                handler: handleAccrueInterest
+              - event: NewReserveFactor(uint256,uint256)
+                handler: handleNewReserveFactor
