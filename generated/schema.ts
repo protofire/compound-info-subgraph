@@ -11,27 +11,35 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class Comptroller extends Entity {
+export class Protocol extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
+
+    this.set("priceOracle", Value.fromBytes(Bytes.empty()));
+    this.set("lastNewOracleBlockNumber", Value.fromBigInt(BigInt.zero()));
+    this.set("latestBlockNumber", Value.fromBigInt(BigInt.zero()));
+    this.set("totalSupplyUsd", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("totalBorrowUsd", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("totalReservesUsd", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save Comptroller entity without an ID");
+    assert(id != null, "Cannot save Protocol entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save Comptroller entity with non-string ID. " +
+        "Cannot save Protocol entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("Comptroller", id.toString(), this);
+      store.set("Protocol", id.toString(), this);
     }
   }
 
-  static load(id: string): Comptroller | null {
-    return changetype<Comptroller | null>(store.get("Comptroller", id));
+  static load(id: string): Protocol | null {
+    return changetype<Protocol | null>(store.get("Protocol", id));
   }
 
   get id(): string {
@@ -43,72 +51,85 @@ export class Comptroller extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get priceOracle(): Bytes | null {
+  get priceOracle(): Bytes {
     let value = this.get("priceOracle");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
+    return value!.toBytes();
   }
 
-  set priceOracle(value: Bytes | null) {
-    if (!value) {
-      this.unset("priceOracle");
-    } else {
-      this.set("priceOracle", Value.fromBytes(<Bytes>value));
-    }
+  set priceOracle(value: Bytes) {
+    this.set("priceOracle", Value.fromBytes(value));
   }
 
-  get closeFactor(): BigInt | null {
-    let value = this.get("closeFactor");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+  get lastNewOracleBlockNumber(): BigInt {
+    let value = this.get("lastNewOracleBlockNumber");
+    return value!.toBigInt();
   }
 
-  set closeFactor(value: BigInt | null) {
-    if (!value) {
-      this.unset("closeFactor");
-    } else {
-      this.set("closeFactor", Value.fromBigInt(<BigInt>value));
-    }
+  set lastNewOracleBlockNumber(value: BigInt) {
+    this.set("lastNewOracleBlockNumber", Value.fromBigInt(value));
   }
 
-  get liquidationIncentive(): BigInt | null {
-    let value = this.get("liquidationIncentive");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+  get latestBlockNumber(): BigInt {
+    let value = this.get("latestBlockNumber");
+    return value!.toBigInt();
   }
 
-  set liquidationIncentive(value: BigInt | null) {
-    if (!value) {
-      this.unset("liquidationIncentive");
-    } else {
-      this.set("liquidationIncentive", Value.fromBigInt(<BigInt>value));
-    }
+  set latestBlockNumber(value: BigInt) {
+    this.set("latestBlockNumber", Value.fromBigInt(value));
   }
 
-  get maxAssets(): BigInt | null {
-    let value = this.get("maxAssets");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+  get markets(): Array<string> {
+    let value = this.get("markets");
+    return value!.toStringArray();
   }
 
-  set maxAssets(value: BigInt | null) {
-    if (!value) {
-      this.unset("maxAssets");
-    } else {
-      this.set("maxAssets", Value.fromBigInt(<BigInt>value));
-    }
+  set markets(value: Array<string>) {
+    this.set("markets", Value.fromStringArray(value));
+  }
+
+  get totalSupplyUsd(): BigDecimal {
+    let value = this.get("totalSupplyUsd");
+    return value!.toBigDecimal();
+  }
+
+  set totalSupplyUsd(value: BigDecimal) {
+    this.set("totalSupplyUsd", Value.fromBigDecimal(value));
+  }
+
+  get totalBorrowUsd(): BigDecimal {
+    let value = this.get("totalBorrowUsd");
+    return value!.toBigDecimal();
+  }
+
+  set totalBorrowUsd(value: BigDecimal) {
+    this.set("totalBorrowUsd", Value.fromBigDecimal(value));
+  }
+
+  get totalReservesUsd(): BigDecimal {
+    let value = this.get("totalReservesUsd");
+    return value!.toBigDecimal();
+  }
+
+  set totalReservesUsd(value: BigDecimal) {
+    this.set("totalReservesUsd", Value.fromBigDecimal(value));
+  }
+
+  get utalization(): BigDecimal {
+    let value = this.get("utalization");
+    return value!.toBigDecimal();
+  }
+
+  set utalization(value: BigDecimal) {
+    this.set("utalization", Value.fromBigDecimal(value));
+  }
+
+  get historicalWeekData(): Array<string> {
+    let value = this.get("historicalWeekData");
+    return value!.toStringArray();
+  }
+
+  set historicalWeekData(value: Array<string>) {
+    this.set("historicalWeekData", Value.fromStringArray(value));
   }
 }
 
@@ -119,6 +140,7 @@ export class Market extends Entity {
 
     this.set("creationBlockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("latestBlockNumber", Value.fromBigInt(BigInt.zero()));
+    this.set("protocol", Value.fromString(""));
     this.set("cTokenSymbol", Value.fromString(""));
     this.set("cTokenDecimals", Value.fromBigInt(BigInt.zero()));
     this.set("underlyingName", Value.fromString(""));
@@ -129,8 +151,8 @@ export class Market extends Entity {
     this.set("reserveFactor", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("cash", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("exchangeRate", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("supplyRate", Value.fromBigInt(BigInt.zero()));
-    this.set("borrowRate", Value.fromBigInt(BigInt.zero()));
+    this.set("supplyRate", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("borrowRate", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("supplyApy", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("borrowApy", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalSupplyApy", Value.fromBigDecimal(BigDecimal.zero()));
@@ -142,6 +164,7 @@ export class Market extends Entity {
     this.set("numberOfSuppliers", Value.fromBigInt(BigInt.zero()));
     this.set("numberOfborrowers", Value.fromBigInt(BigInt.zero()));
     this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
   }
 
   save(): void {
@@ -186,6 +209,15 @@ export class Market extends Entity {
 
   set latestBlockNumber(value: BigInt) {
     this.set("latestBlockNumber", Value.fromBigInt(value));
+  }
+
+  get protocol(): string {
+    let value = this.get("protocol");
+    return value!.toString();
+  }
+
+  set protocol(value: string) {
+    this.set("protocol", Value.fromString(value));
   }
 
   get cTokenSymbol(): string {
@@ -278,22 +310,22 @@ export class Market extends Entity {
     this.set("exchangeRate", Value.fromBigDecimal(value));
   }
 
-  get supplyRate(): BigInt {
+  get supplyRate(): BigDecimal {
     let value = this.get("supplyRate");
-    return value!.toBigInt();
+    return value!.toBigDecimal();
   }
 
-  set supplyRate(value: BigInt) {
-    this.set("supplyRate", Value.fromBigInt(value));
+  set supplyRate(value: BigDecimal) {
+    this.set("supplyRate", Value.fromBigDecimal(value));
   }
 
-  get borrowRate(): BigInt {
+  get borrowRate(): BigDecimal {
     let value = this.get("borrowRate");
-    return value!.toBigInt();
+    return value!.toBigDecimal();
   }
 
-  set borrowRate(value: BigInt) {
-    this.set("borrowRate", Value.fromBigInt(value));
+  set borrowRate(value: BigDecimal) {
+    this.set("borrowRate", Value.fromBigDecimal(value));
   }
 
   get supplyApy(): BigDecimal {
@@ -393,6 +425,15 @@ export class Market extends Entity {
 
   set usdcPerUnderlying(value: BigDecimal) {
     this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
+  }
+
+  get ethPerUnderlying(): BigDecimal {
+    let value = this.get("ethPerUnderlying");
+    return value!.toBigDecimal();
+  }
+
+  set ethPerUnderlying(value: BigDecimal) {
+    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
   }
 
   get historicalHourData(): Array<string> {
@@ -834,6 +875,112 @@ export class MarketWeekData extends Entity {
 
   set totalReserves(value: BigDecimal) {
     this.set("totalReserves", Value.fromBigDecimal(value));
+  }
+
+  get utalization(): BigDecimal {
+    let value = this.get("utalization");
+    return value!.toBigDecimal();
+  }
+
+  set utalization(value: BigDecimal) {
+    this.set("utalization", Value.fromBigDecimal(value));
+  }
+
+  get txCount(): BigInt {
+    let value = this.get("txCount");
+    return value!.toBigInt();
+  }
+
+  set txCount(value: BigInt) {
+    this.set("txCount", Value.fromBigInt(value));
+  }
+}
+
+export class ProtocolWeekData extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("protocol", Value.fromString(""));
+    this.set("date", Value.fromBigInt(BigInt.zero()));
+    this.set("totalSupplyUsd", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("totalBorrowUsd", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("totalReservesUsd", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("txCount", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save ProtocolWeekData entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save ProtocolWeekData entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("ProtocolWeekData", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ProtocolWeekData | null {
+    return changetype<ProtocolWeekData | null>(
+      store.get("ProtocolWeekData", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get protocol(): string {
+    let value = this.get("protocol");
+    return value!.toString();
+  }
+
+  set protocol(value: string) {
+    this.set("protocol", Value.fromString(value));
+  }
+
+  get date(): BigInt {
+    let value = this.get("date");
+    return value!.toBigInt();
+  }
+
+  set date(value: BigInt) {
+    this.set("date", Value.fromBigInt(value));
+  }
+
+  get totalSupplyUsd(): BigDecimal {
+    let value = this.get("totalSupplyUsd");
+    return value!.toBigDecimal();
+  }
+
+  set totalSupplyUsd(value: BigDecimal) {
+    this.set("totalSupplyUsd", Value.fromBigDecimal(value));
+  }
+
+  get totalBorrowUsd(): BigDecimal {
+    let value = this.get("totalBorrowUsd");
+    return value!.toBigDecimal();
+  }
+
+  set totalBorrowUsd(value: BigDecimal) {
+    this.set("totalBorrowUsd", Value.fromBigDecimal(value));
+  }
+
+  get totalReservesUsd(): BigDecimal {
+    let value = this.get("totalReservesUsd");
+    return value!.toBigDecimal();
+  }
+
+  set totalReservesUsd(value: BigDecimal) {
+    this.set("totalReservesUsd", Value.fromBigDecimal(value));
   }
 
   get utalization(): BigDecimal {

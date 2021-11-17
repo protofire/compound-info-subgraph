@@ -9,3 +9,14 @@ export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
     }
     return bd;
 }
+
+export function tokenAmountToDecimal(
+    tokenAmount: BigInt,
+    decimals: BigInt
+): BigDecimal {
+    if (ZERO_BI == decimals) {
+        return tokenAmount.toBigDecimal();
+    } else {
+        return tokenAmount.toBigDecimal().div(exponentToBigDecimal(decimals));
+    }
+}

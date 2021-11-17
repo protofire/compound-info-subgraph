@@ -9,38 +9,34 @@ import {
 } from "../../generated/templates/cToken/cToken";
 import { Market } from "../../generated/schema";
 
-import { exponentToBigDecimal } from "../utils";
-import { updateMarket } from "../market";
+import { updateMarket } from "../mapping-helpers/market";
+import { updateProtocolSummaryData } from "../mapping-helpers/protocol";
+import {
+    updateMarketDayData,
+    updateMarketHourData,
+    updateMarketWeekData,
+    updateProtocolWeekData,
+} from "../mapping-helpers/historical-data";
 
-export function handleMint(event: MintEvent): void {
-    const cTokenAddress = event.address;
-    const blockNumber = event.block.number;
+export function handleMint(event: MintEvent): void {}
 
-    updateMarket(cTokenAddress, blockNumber);
+export function handleAccrueInterest(event: AccrueInterestEvent): void {
+    updateMarket(event.address, event.block.number);
+    updateProtocolSummaryData(event.block.number);
+
+    // Update historical data after updateMarket and updateProtocolSummaryData is called
+    updateMarketHourData(event);
+    updateMarketDayData(event);
+    updateMarketWeekData(event);
+    updateProtocolWeekData(event);
 }
 
-export function handleRedeem(event: RedeemEvent): void {
-    // const cTokenAddress = event.address.toHexString();
-    // const blockNumber = event.block.number;
-    // const market = Market.load(cTokenAddress);
-    // if (market == null) {
-    //     return; // This won't happen
-    // }
-    // const underlyingRedeemAmount = convertTokenToDecimal(
-    //     event.params.mintToken,
-    //     market.underlyingDecimals
-    // );
-    // market.totalSupplied = market.totalSupplied.minus(underlyingRedeemAmount);
-    // market.latestBlockNumber = blockNumber;
-    // market.save();
-}
+export function handleRedeem(event: RedeemEvent): void {}
 
 export function handleBorrow(event: BorrowEvent): void {}
 
 export function handleRepayBorrow(event: RepayBorrowEvent): void {}
 
 export function handleLiquidateBorrow(event: LiquidateBorrowEvent): void {}
-
-export function handleAccrueInterest(event: AccrueInterestEvent): void {}
 
 export function handleNewReserveFactor(event: NewReserveFactorEvent): void {}
