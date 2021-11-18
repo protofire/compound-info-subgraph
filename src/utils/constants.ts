@@ -20,3 +20,10 @@ export const SEC_PER_DAY = BigInt.fromU32(86400);
 export const SEC_PER_WEEK = BigInt.fromU32(604800);
 
 export const PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER = BigInt.fromU32(7715908);
+
+export const SEC_PER_BLOCK = BigDecimal.fromString("13.5");
+export const DAYS_PER_YEAR = BigInt.fromU32(365);
+
+// Derived
+export const BLOCK_PER_SEC = BigDecimal.fromString("1").div(SEC_PER_BLOCK);
+export const BLOCKS_PER_DAY = BLOCK_PER_SEC.times(SEC_PER_DAY.toBigDecimal());

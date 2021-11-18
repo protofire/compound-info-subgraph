@@ -37,6 +37,7 @@ export function createProtocol(
 
     protocol.priceOracle = priceOracleAddress;
     protocol.lastNewOracleBlockNumber = blockNumber;
+    protocol.latestBlockNumber = blockNumber;
 
     protocol.markets = [];
     protocol.totalSupplyUsd = ZERO_BD;

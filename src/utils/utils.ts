@@ -1,6 +1,12 @@
 import { BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 
-import { ZERO_BI, ONE_BI } from "./constants";
+import {
+    ZERO_BI,
+    ONE_BI,
+    ONE_BD,
+    BLOCKS_PER_DAY,
+    DAYS_PER_YEAR,
+} from "./constants";
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
     let bd = BigDecimal.fromString("1");
@@ -19,4 +25,35 @@ export function tokenAmountToDecimal(
     } else {
         return tokenAmount.toBigDecimal().div(exponentToBigDecimal(decimals));
     }
+}
+
+export function calculateApy(ratePerBlock: BigDecimal): BigDecimal {
+    const base = ratePerBlock.times(BLOCKS_PER_DAY).plus(ONE_BD);
+
+    let apy = BigDecimal.fromString("1");
+    for (let i = ZERO_BI; i.lt(DAYS_PER_YEAR); i = i.plus(ONE_BI)) {
+        apy = apy.times(base);
+    }
+    return apy.minus(ONE_BD);
+}
+
+// Following the calculation here: https://gist.github.com/ajb413/d32442edae9251ad395436d5b80d4480
+export function calculateCompDistrubtionApy(
+    totalSupplyOrBorrow: BigDecimal,
+    compSpeed: BigDecimal,
+    usdcPerComp: BigDecimal,
+    usdcPerUnderlying: BigDecimal
+): BigDecimal {
+    const compDistributionPerDay = compSpeed.times(BLOCKS_PER_DAY);
+    const base = ONE_BD.plus(
+        usdcPerComp
+            .times(compDistributionPerDay)
+            .div(totalSupplyOrBorrow.times(usdcPerUnderlying))
+    );
+
+    let apy = BigDecimal.fromString("1");
+    for (let i = ZERO_BI; i.lt(DAYS_PER_YEAR); i = i.plus(ONE_BI)) {
+        apy = apy.times(base);
+    }
+    return apy.minus(ONE_BD);
 }

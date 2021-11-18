@@ -19,6 +19,7 @@ export class Protocol extends Entity {
     this.set("priceOracle", Value.fromBytes(Bytes.empty()));
     this.set("lastNewOracleBlockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("latestBlockNumber", Value.fromBigInt(BigInt.zero()));
+    this.set("markets", Value.fromStringArray(new Array(0)));
     this.set("totalSupplyUsd", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalBorrowUsd", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalReservesUsd", Value.fromBigDecimal(BigDecimal.zero()));
@@ -140,19 +141,19 @@ export class Market extends Entity {
 
     this.set("creationBlockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("latestBlockNumber", Value.fromBigInt(BigInt.zero()));
-    this.set("protocol", Value.fromString(""));
     this.set("cTokenSymbol", Value.fromString(""));
     this.set("cTokenDecimals", Value.fromBigInt(BigInt.zero()));
     this.set("underlyingName", Value.fromString(""));
     this.set("underlyingSymbol", Value.fromString(""));
     this.set("underlyingAddress", Value.fromBytes(Bytes.empty()));
     this.set("underlyingDecimals", Value.fromBigInt(BigInt.zero()));
+    this.set("comptrollerAddress", Value.fromBytes(Bytes.empty()));
     this.set("collatoralFactor", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("reserveFactor", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("cash", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("exchangeRate", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("supplyRate", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("borrowRate", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("cTokenPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("supplyRatePerBlock", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("borrowRatePerBlock", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("supplyApy", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("borrowApy", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalSupplyApy", Value.fromBigDecimal(BigDecimal.zero()));
@@ -161,10 +162,13 @@ export class Market extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalReserves", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("compSpeedSupply", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("compSpeedBorrow", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("numberOfSuppliers", Value.fromBigInt(BigInt.zero()));
     this.set("numberOfborrowers", Value.fromBigInt(BigInt.zero()));
     this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerComp", Value.fromBigDecimal(BigDecimal.zero()));
   }
 
   save(): void {
@@ -209,15 +213,6 @@ export class Market extends Entity {
 
   set latestBlockNumber(value: BigInt) {
     this.set("latestBlockNumber", Value.fromBigInt(value));
-  }
-
-  get protocol(): string {
-    let value = this.get("protocol");
-    return value!.toString();
-  }
-
-  set protocol(value: string) {
-    this.set("protocol", Value.fromString(value));
   }
 
   get cTokenSymbol(): string {
@@ -274,6 +269,15 @@ export class Market extends Entity {
     this.set("underlyingDecimals", Value.fromBigInt(value));
   }
 
+  get comptrollerAddress(): Bytes {
+    let value = this.get("comptrollerAddress");
+    return value!.toBytes();
+  }
+
+  set comptrollerAddress(value: Bytes) {
+    this.set("comptrollerAddress", Value.fromBytes(value));
+  }
+
   get collatoralFactor(): BigDecimal {
     let value = this.get("collatoralFactor");
     return value!.toBigDecimal();
@@ -301,31 +305,31 @@ export class Market extends Entity {
     this.set("cash", Value.fromBigDecimal(value));
   }
 
-  get exchangeRate(): BigDecimal {
-    let value = this.get("exchangeRate");
+  get cTokenPerUnderlying(): BigDecimal {
+    let value = this.get("cTokenPerUnderlying");
     return value!.toBigDecimal();
   }
 
-  set exchangeRate(value: BigDecimal) {
-    this.set("exchangeRate", Value.fromBigDecimal(value));
+  set cTokenPerUnderlying(value: BigDecimal) {
+    this.set("cTokenPerUnderlying", Value.fromBigDecimal(value));
   }
 
-  get supplyRate(): BigDecimal {
-    let value = this.get("supplyRate");
+  get supplyRatePerBlock(): BigDecimal {
+    let value = this.get("supplyRatePerBlock");
     return value!.toBigDecimal();
   }
 
-  set supplyRate(value: BigDecimal) {
-    this.set("supplyRate", Value.fromBigDecimal(value));
+  set supplyRatePerBlock(value: BigDecimal) {
+    this.set("supplyRatePerBlock", Value.fromBigDecimal(value));
   }
 
-  get borrowRate(): BigDecimal {
-    let value = this.get("borrowRate");
+  get borrowRatePerBlock(): BigDecimal {
+    let value = this.get("borrowRatePerBlock");
     return value!.toBigDecimal();
   }
 
-  set borrowRate(value: BigDecimal) {
-    this.set("borrowRate", Value.fromBigDecimal(value));
+  set borrowRatePerBlock(value: BigDecimal) {
+    this.set("borrowRatePerBlock", Value.fromBigDecimal(value));
   }
 
   get supplyApy(): BigDecimal {
@@ -400,6 +404,24 @@ export class Market extends Entity {
     this.set("utalization", Value.fromBigDecimal(value));
   }
 
+  get compSpeedSupply(): BigDecimal {
+    let value = this.get("compSpeedSupply");
+    return value!.toBigDecimal();
+  }
+
+  set compSpeedSupply(value: BigDecimal) {
+    this.set("compSpeedSupply", Value.fromBigDecimal(value));
+  }
+
+  get compSpeedBorrow(): BigDecimal {
+    let value = this.get("compSpeedBorrow");
+    return value!.toBigDecimal();
+  }
+
+  set compSpeedBorrow(value: BigDecimal) {
+    this.set("compSpeedBorrow", Value.fromBigDecimal(value));
+  }
+
   get numberOfSuppliers(): BigInt {
     let value = this.get("numberOfSuppliers");
     return value!.toBigInt();
@@ -434,6 +456,15 @@ export class Market extends Entity {
 
   set ethPerUnderlying(value: BigDecimal) {
     this.set("ethPerUnderlying", Value.fromBigDecimal(value));
+  }
+
+  get usdcPerComp(): BigDecimal {
+    let value = this.get("usdcPerComp");
+    return value!.toBigDecimal();
+  }
+
+  set usdcPerComp(value: BigDecimal) {
+    this.set("usdcPerComp", Value.fromBigDecimal(value));
   }
 
   get historicalHourData(): Array<string> {
@@ -479,6 +510,8 @@ export class MarketHourData extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalReserves", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("txCount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -598,6 +631,24 @@ export class MarketHourData extends Entity {
     this.set("utalization", Value.fromBigDecimal(value));
   }
 
+  get usdcPerUnderlying(): BigDecimal {
+    let value = this.get("usdcPerUnderlying");
+    return value!.toBigDecimal();
+  }
+
+  set usdcPerUnderlying(value: BigDecimal) {
+    this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
+  }
+
+  get ethPerUnderlying(): BigDecimal {
+    let value = this.get("ethPerUnderlying");
+    return value!.toBigDecimal();
+  }
+
+  set ethPerUnderlying(value: BigDecimal) {
+    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
+  }
+
   get txCount(): BigInt {
     let value = this.get("txCount");
     return value!.toBigInt();
@@ -623,6 +674,8 @@ export class MarketDayData extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalReserves", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("txCount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -742,6 +795,24 @@ export class MarketDayData extends Entity {
     this.set("utalization", Value.fromBigDecimal(value));
   }
 
+  get usdcPerUnderlying(): BigDecimal {
+    let value = this.get("usdcPerUnderlying");
+    return value!.toBigDecimal();
+  }
+
+  set usdcPerUnderlying(value: BigDecimal) {
+    this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
+  }
+
+  get ethPerUnderlying(): BigDecimal {
+    let value = this.get("ethPerUnderlying");
+    return value!.toBigDecimal();
+  }
+
+  set ethPerUnderlying(value: BigDecimal) {
+    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
+  }
+
   get txCount(): BigInt {
     let value = this.get("txCount");
     return value!.toBigInt();
@@ -767,6 +838,8 @@ export class MarketWeekData extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("totalReserves", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("txCount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -884,6 +957,24 @@ export class MarketWeekData extends Entity {
 
   set utalization(value: BigDecimal) {
     this.set("utalization", Value.fromBigDecimal(value));
+  }
+
+  get usdcPerUnderlying(): BigDecimal {
+    let value = this.get("usdcPerUnderlying");
+    return value!.toBigDecimal();
+  }
+
+  set usdcPerUnderlying(value: BigDecimal) {
+    this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
+  }
+
+  get ethPerUnderlying(): BigDecimal {
+    let value = this.get("ethPerUnderlying");
+    return value!.toBigDecimal();
+  }
+
+  set ethPerUnderlying(value: BigDecimal) {
+    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
   }
 
   get txCount(): BigInt {

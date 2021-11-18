@@ -11,7 +11,7 @@ import { Market, Protocol } from "../../generated/schema";
 import { PriceOracle1 } from "../../generated/templates/cToken/PriceOracle1";
 import { PriceOracle2 } from "../../generated/templates/cToken/PriceOracle2";
 
-import { ZERO_BD } from "../utils/constants";
+import { ZERO_BD, ONE_BD } from "../utils/constants";
 import {
     PROTOCOL_ID,
     PRICE_ORACLE_1_ADDRESS,
@@ -149,4 +149,9 @@ export function getETHinUSD(blockNumber: BigInt): BigDecimal {
               .div(exponentToBigDecimal(BigInt.fromI32(18)));
 
     return ethPriceInUSD;
+}
+
+export function getCOMPinUSD(blockNumber: BigInt): BigDecimal {
+    // TODO: implement this!
+    return ONE_BD;
 }

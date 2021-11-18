@@ -10,6 +10,7 @@ import {
 import { Market, Protocol } from "../../generated/schema";
 import { CToken } from "../../generated/templates/cToken/cToken";
 import { ERC20 } from "../../generated/templates/cToken/ERC20";
+import { Comptroller } from "../../generated/comptroller/comptroller";
 
 import {
     ETH_ADDRESS,
@@ -19,9 +20,20 @@ import {
     PROTOCOL_ID,
     ZERO_BI,
     ZERO_BD,
+    SEC_PER_BLOCK,
 } from "../utils/constants";
-import { getTokenPrice, getETHinUSD, getUSDCpriceETH } from "./oracle";
-import { exponentToBigDecimal, tokenAmountToDecimal } from "../utils/utils";
+import {
+    getTokenPrice,
+    getETHinUSD,
+    getUSDCpriceETH,
+    getCOMPinUSD,
+} from "./oracle";
+import {
+    exponentToBigDecimal,
+    tokenAmountToDecimal,
+    calculateApy,
+    calculateCompDistrubtionApy,
+} from "../utils/utils";
 
 /**
  * Helper function to create a new market. This populates all fields which won't change throughout the lifetime of the market
@@ -54,6 +66,7 @@ export function createMarket(
     market.latestBlockNumber = blockNumber;
     market.cTokenSymbol = contract.symbol();
     market.cTokenDecimals = BigInt.fromI32(contract.decimals());
+    market.comptrollerAddress = contract.comptroller();
 
     if (CETH_ADDRESS == marketAddress.toHexString()) {
         // cETH has a different interface
@@ -84,9 +97,9 @@ export function createMarket(
     market.collatoralFactor = ZERO_BD;
     market.reserveFactor = ZERO_BD;
     market.cash = ZERO_BD;
-    market.exchangeRate = ZERO_BD;
-    market.supplyRate = ZERO_BD;
-    market.borrowRate = ZERO_BD;
+    market.cTokenPerUnderlying = ZERO_BD;
+    market.supplyRatePerBlock = ZERO_BD;
+    market.supplyRatePerBlock = ZERO_BD;
     market.supplyApy = ZERO_BD;
     market.borrowApy = ZERO_BD;
     market.totalSupplyApy = ZERO_BD;
@@ -187,33 +200,26 @@ export function updateMarket(
         }
 
         market.latestBlockNumber = contract.accrualBlockNumber();
-        market.totalSupply = contract
-            .totalSupply()
-            .toBigDecimal()
-            .div(market.cTokenDecimals.toBigDecimal());
 
-        /* Exchange rate explanation
-           In Practice
-            - If you call the cDAI contract on etherscan it comes back (2.0 * 10^26)
-            - If you call the cUSDC contract on etherscan it comes back (2.0 * 10^14)
-            - The real value is ~0.02. So cDAI is off by 10^28, and cUSDC 10^16
-           How to calculate for tokens with different decimals
-            - Must div by tokenDecimals, 10^market.underlyingDecimals
-            - Must multiply by ctokenDecimals, 10^8
-            - Must div by mantissa, 10^18
-         */
-        market.exchangeRate = contract
-            .exchangeRateStored()
-            .toBigDecimal()
-            .div(exponentToBigDecimal(market.underlyingDecimals))
-            .times(market.cTokenDecimals.toBigDecimal())
-            .div(exponentToBigDecimal(BigInt.fromI32(18)))
-            .truncate(18);
+        // mantisa for this is 18 + underlying decimals - ctoken decimals, i.e the value is scaled by 10^18 in contract
+        market.cTokenPerUnderlying = tokenAmountToDecimal(
+            contract.exchangeRateStored(),
+            BigInt.fromU32(18)
+                .plus(market.underlyingDecimals)
+                .minus(market.cTokenDecimals)
+        );
+
+        market.totalSupply = tokenAmountToDecimal(
+            contract.totalSupply(),
+            market.cTokenDecimals
+        ).times(market.cTokenPerUnderlying);
 
         market.totalReserves = tokenAmountToDecimal(
             contract.totalReserves(),
             market.underlyingDecimals
         );
+
+        market.utalization = market.totalBorrow.div(market.totalSupply);
 
         market.totalBorrow = tokenAmountToDecimal(
             contract.totalBorrows(),
@@ -225,28 +231,53 @@ export function updateMarket(
             market.underlyingDecimals
         );
 
-        // Must convert to BigDecimal, and remove 10^18 that is used for Exp in Compound Solidity
-        market.borrowRate = contract
-            .borrowRatePerBlock()
-            .toBigDecimal()
-            .times(BigDecimal.fromString("2102400"))
-            .div(exponentToBigDecimal(BigInt.fromU32(18)));
+        // Remove 10^18 that scales this value
+        market.supplyRatePerBlock = tokenAmountToDecimal(
+            contract.supplyRatePerBlock(),
+            BigInt.fromU32(18)
+        );
 
-        // This fails on only the first call to cZRX. It is unclear why, but otherwise it works.
-        // So we handle it like this.
-        let supplyRatePerBlock = contract.try_supplyRatePerBlock();
-        if (supplyRatePerBlock.reverted) {
-            log.info(
-                "***CALL FAILED*** : cERC20 supplyRatePerBlock() reverted",
-                []
-            );
-            market.supplyRate = ZERO_BD;
-        } else {
-            market.supplyRate = supplyRatePerBlock.value
-                .toBigDecimal()
-                .times(BigDecimal.fromString("2102400"))
-                .div(exponentToBigDecimal(BigInt.fromU32(18)));
-        }
+        // Remove 10^18 that scales this value
+        market.borrowRatePerBlock = tokenAmountToDecimal(
+            contract.borrowRatePerBlock(),
+            BigInt.fromU32(18)
+        );
+
+        market.supplyApy = calculateApy(market.supplyRatePerBlock);
+        market.borrowApy = calculateApy(market.borrowRatePerBlock);
+
+        market.comptrollerAddress = contract.comptroller();
+
+        const comptrollerContract = Comptroller.bind(market.comptrollerAddress);
+
+        // Comp speeds with the 10^18 scaling removed
+        market.compSpeedSupply = tokenAmountToDecimal(
+            comptrollerContract.compSupplySpeeds(marketAddress),
+            BigInt.fromU32(18)
+        );
+        market.compSpeedBorrow = tokenAmountToDecimal(
+            comptrollerContract.compBorrowSpeeds(marketAddress),
+            BigInt.fromU32(18)
+        );
+
+        market.usdcPerComp = getCOMPinUSD(blockNumber);
+
+        const compSupplyApy = calculateCompDistrubtionApy(
+            market.totalSupply,
+            market.compSpeedSupply,
+            market.usdcPerComp,
+            market.usdcPerUnderlying
+        );
+        const compBorrowApy = calculateCompDistrubtionApy(
+            market.totalBorrow,
+            market.compSpeedBorrow,
+            market.usdcPerComp,
+            market.usdcPerUnderlying
+        );
+
+        market.totalSupplyApy = market.supplyApy.plus(compSupplyApy);
+        market.totalBorrowApy = market.borrowApy.plus(compBorrowApy);
+
         market.save();
     }
 }
