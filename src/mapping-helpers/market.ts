@@ -1,11 +1,4 @@
-import {
-    Address,
-    BigDecimal,
-    BigInt,
-    ByteArray,
-    Bytes,
-    log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
 import { Market, Protocol } from "../../generated/schema";
 import { CToken } from "../../generated/templates/cToken/cToken";
@@ -17,19 +10,16 @@ import {
     CETH_ADDRESS,
     SAI_ADDRESS,
     CUSDC_ADDRESS,
+    COMP_ADDRESS,
+    CCOMP_ADDRESS,
     PROTOCOL_ID,
     ZERO_BI,
     ZERO_BD,
+    ONE_BD,
     SEC_PER_BLOCK,
 } from "../utils/constants";
+import { getUsdcPerEth, getUsdcPerUnderlying } from "./oracle";
 import {
-    getTokenPrice,
-    getETHinUSD,
-    getUSDCpriceETH,
-    getCOMPinUSD,
-} from "./oracle";
-import {
-    exponentToBigDecimal,
     tokenAmountToDecimal,
     calculateApy,
     calculateCompDistrubtionApy,
@@ -108,9 +98,9 @@ export function createMarket(
     market.totalBorrow = ZERO_BD;
     market.totalReserves = ZERO_BD;
     market.utalization = ZERO_BD;
-    market.numberOfSuppliers = ZERO_BI;
-    market.numberOfborrowers = ZERO_BI;
     market.usdcPerUnderlying = ZERO_BD;
+    market.usdcPerEth = ZERO_BD;
+    market.usdcPerComp = ZERO_BD;
 
     return market;
 }
@@ -136,70 +126,26 @@ export function updateMarket(
         let contractAddress = Address.fromString(market.id);
         let contract = CToken.bind(contractAddress);
 
-        // After block 10678764 price is calculated based on USD instead of ETH
-        if (blockNumber.gt(BigInt.fromU64(10678764))) {
-            let ethPriceInUSD = getETHinUSD(blockNumber);
-
-            if (ZERO_BD == ethPriceInUSD) {
-                log.warning("***ERROR: GOT ZERO FOR ETH PRICE IN USD", []);
-                return;
-            }
-
-            // if cETH, we only update USD price
-            if (CETH_ADDRESS == market.id) {
-                market.usdcPerUnderlying = ethPriceInUSD.truncate(
-                    market.underlyingDecimals.toU32()
-                );
-            } else {
-                let tokenPriceUSD = getTokenPrice(
-                    blockNumber,
-                    contractAddress,
-                    changetype<Address>(market.underlyingAddress),
-                    market.underlyingDecimals
-                );
-                market.ethPerUnderlying = tokenPriceUSD
-                    .div(ethPriceInUSD)
-                    .truncate(market.underlyingDecimals.toU32());
-                // if USDC, we only update ETH price
-                if (CUSDC_ADDRESS != market.id) {
-                    market.usdcPerUnderlying = tokenPriceUSD.truncate(
-                        market.underlyingDecimals.toU32()
-                    );
-                }
-            }
-        } else {
-            let usdPriceInEth = getUSDCpriceETH(blockNumber);
-
-            if (ZERO_BD == usdPriceInEth) {
-                log.warning("***ERROR: GOT ZERO FOR USD PRICE IN ETH", []);
-                return;
-            }
-
-            // if cETH, we only update USD price
-            if (CETH_ADDRESS == market.id) {
-                market.usdcPerUnderlying = market.ethPerUnderlying
-                    .div(usdPriceInEth)
-                    .truncate(market.underlyingDecimals.toU32());
-            } else {
-                let tokenPriceEth = getTokenPrice(
-                    blockNumber,
-                    contractAddress,
-                    changetype<Address>(market.underlyingAddress),
-                    market.underlyingDecimals
-                );
-                market.ethPerUnderlying = tokenPriceEth.truncate(
-                    market.underlyingDecimals.toU32()
-                );
-                // if USDC, we only update ETH price
-                if (CUSDC_ADDRESS != market.id) {
-                    market.usdcPerUnderlying = market.ethPerUnderlying
-                        .div(usdPriceInEth)
-                        .truncate(market.underlyingDecimals.toU32());
-                }
-            }
-        }
-
         market.latestBlockNumber = contract.accrualBlockNumber();
+
+        // This must come before calling getUsdcPerUnderlying
+        market.usdcPerEth = getUsdcPerEth(blockNumber);
+
+        market.usdcPerUnderlying = getUsdcPerUnderlying(
+            changetype<Address>(market.underlyingAddress),
+            Address.fromString(market.id),
+            market.underlyingDecimals,
+            blockNumber,
+            market.usdcPerEth
+        );
+
+        market.usdcPerComp = getUsdcPerUnderlying(
+            Address.fromString(COMP_ADDRESS),
+            Address.fromString(CCOMP_ADDRESS),
+            BigInt.fromU32(18),
+            blockNumber,
+            market.usdcPerEth
+        );
 
         // mantisa for this is 18 + underlying decimals - ctoken decimals, i.e the value is scaled by 10^18 in contract
         market.cTokenPerUnderlying = tokenAmountToDecimal(
@@ -248,7 +194,9 @@ export function updateMarket(
 
         market.comptrollerAddress = contract.comptroller();
 
-        const comptrollerContract = Comptroller.bind(market.comptrollerAddress);
+        const comptrollerContract = Comptroller.bind(
+            changetype<Address>(market.comptrollerAddress)
+        );
 
         // Comp speeds with the 10^18 scaling removed
         market.compSpeedSupply = tokenAmountToDecimal(
@@ -259,8 +207,6 @@ export function updateMarket(
             comptrollerContract.compBorrowSpeeds(marketAddress),
             BigInt.fromU32(18)
         );
-
-        market.usdcPerComp = getCOMPinUSD(blockNumber);
 
         const compSupplyApy = calculateCompDistrubtionApy(
             market.totalSupply,

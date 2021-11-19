@@ -7,7 +7,6 @@ import {
     AccrueInterest as AccrueInterestEvent,
     NewReserveFactor as NewReserveFactorEvent,
 } from "../../generated/templates/cToken/cToken";
-import { Market } from "../../generated/schema";
 
 import { updateMarket } from "../mapping-helpers/market";
 import { updateProtocolSummaryData } from "../mapping-helpers/protocol";

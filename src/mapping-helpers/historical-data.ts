@@ -1,10 +1,4 @@
-import {
-    Address,
-    BigDecimal,
-    BigInt,
-    ethereum,
-    log,
-} from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
     Market,
@@ -22,7 +16,6 @@ import {
     ZERO_BD,
     ZERO_BI,
     ONE_BD,
-    ONE_BI,
     PROTOCOL_ID,
 } from "../utils/constants";
 
@@ -58,7 +51,7 @@ export function updateMarketHourData(event: ethereum.Event): void {
         marketData.totalReserves = ZERO_BD;
         marketData.utalization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
-        marketData.ethPerUnderlying = ZERO_BD;
+        marketData.usdcPerEth = ZERO_BD;
         marketData.txCount = ZERO_BI;
     }
 
@@ -103,9 +96,17 @@ export function updateMarketHourData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.usdcPerUnderlying.times(newValueWeigth));
 
-    marketData.ethPerUnderlying = marketData.ethPerUnderlying
+    marketData.usdcPerEth = marketData.usdcPerEth
         .times(oldValueWeight)
-        .plus(market.ethPerUnderlying.times(newValueWeigth));
+        .plus(market.usdcPerEth.times(newValueWeigth));
+
+    marketData.usdcPerComp = marketData.usdcPerComp
+        .times(oldValueWeight)
+        .plus(market.usdcPerComp.times(newValueWeigth));
+
+    marketData.usdcPerComp = marketData.usdcPerComp
+        .times(oldValueWeight)
+        .plus(market.usdcPerComp.times(newValueWeigth));
 
     marketData.txCount = marketData.txCount.plus(BigInt.fromU32(1));
 
@@ -145,7 +146,7 @@ export function updateMarketDayData(event: ethereum.Event): void {
         marketData.totalReserves = ZERO_BD;
         marketData.utalization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
-        marketData.ethPerUnderlying = ZERO_BD;
+        marketData.usdcPerEth = ZERO_BD;
         marketData.txCount = ZERO_BI;
     }
 
@@ -190,9 +191,13 @@ export function updateMarketDayData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.usdcPerUnderlying.times(newValueWeigth));
 
-    marketData.ethPerUnderlying = marketData.ethPerUnderlying
+    marketData.usdcPerEth = marketData.usdcPerEth
         .times(oldValueWeight)
-        .plus(market.ethPerUnderlying.times(newValueWeigth));
+        .plus(market.usdcPerEth.times(newValueWeigth));
+
+    marketData.usdcPerComp = marketData.usdcPerComp
+        .times(oldValueWeight)
+        .plus(market.usdcPerComp.times(newValueWeigth));
 
     marketData.txCount = marketData.txCount.plus(BigInt.fromU32(1));
 
@@ -231,7 +236,7 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         marketData.totalReserves = ZERO_BD;
         marketData.utalization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
-        marketData.ethPerUnderlying = ZERO_BD;
+        marketData.usdcPerEth = ZERO_BD;
         marketData.txCount = ZERO_BI;
     }
 
@@ -276,9 +281,13 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.usdcPerUnderlying.times(newValueWeigth));
 
-    marketData.ethPerUnderlying = marketData.ethPerUnderlying
+    marketData.usdcPerEth = marketData.usdcPerEth
         .times(oldValueWeight)
-        .plus(market.ethPerUnderlying.times(newValueWeigth));
+        .plus(market.usdcPerEth.times(newValueWeigth));
+
+    marketData.usdcPerComp = marketData.usdcPerComp
+        .times(oldValueWeight)
+        .plus(market.usdcPerComp.times(newValueWeigth));
 
     marketData.txCount = marketData.txCount.plus(BigInt.fromU32(1));
 

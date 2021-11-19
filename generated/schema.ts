@@ -164,10 +164,8 @@ export class Market extends Entity {
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("compSpeedSupply", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("compSpeedBorrow", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("numberOfSuppliers", Value.fromBigInt(BigInt.zero()));
-    this.set("numberOfborrowers", Value.fromBigInt(BigInt.zero()));
     this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerEth", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("usdcPerComp", Value.fromBigDecimal(BigDecimal.zero()));
   }
 
@@ -422,24 +420,6 @@ export class Market extends Entity {
     this.set("compSpeedBorrow", Value.fromBigDecimal(value));
   }
 
-  get numberOfSuppliers(): BigInt {
-    let value = this.get("numberOfSuppliers");
-    return value!.toBigInt();
-  }
-
-  set numberOfSuppliers(value: BigInt) {
-    this.set("numberOfSuppliers", Value.fromBigInt(value));
-  }
-
-  get numberOfborrowers(): BigInt {
-    let value = this.get("numberOfborrowers");
-    return value!.toBigInt();
-  }
-
-  set numberOfborrowers(value: BigInt) {
-    this.set("numberOfborrowers", Value.fromBigInt(value));
-  }
-
   get usdcPerUnderlying(): BigDecimal {
     let value = this.get("usdcPerUnderlying");
     return value!.toBigDecimal();
@@ -449,13 +429,13 @@ export class Market extends Entity {
     this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
   }
 
-  get ethPerUnderlying(): BigDecimal {
-    let value = this.get("ethPerUnderlying");
+  get usdcPerEth(): BigDecimal {
+    let value = this.get("usdcPerEth");
     return value!.toBigDecimal();
   }
 
-  set ethPerUnderlying(value: BigDecimal) {
-    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
+  set usdcPerEth(value: BigDecimal) {
+    this.set("usdcPerEth", Value.fromBigDecimal(value));
   }
 
   get usdcPerComp(): BigDecimal {
@@ -511,7 +491,8 @@ export class MarketHourData extends Entity {
     this.set("totalReserves", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerEth", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerComp", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("txCount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -640,13 +621,22 @@ export class MarketHourData extends Entity {
     this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
   }
 
-  get ethPerUnderlying(): BigDecimal {
-    let value = this.get("ethPerUnderlying");
+  get usdcPerEth(): BigDecimal {
+    let value = this.get("usdcPerEth");
     return value!.toBigDecimal();
   }
 
-  set ethPerUnderlying(value: BigDecimal) {
-    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
+  set usdcPerEth(value: BigDecimal) {
+    this.set("usdcPerEth", Value.fromBigDecimal(value));
+  }
+
+  get usdcPerComp(): BigDecimal {
+    let value = this.get("usdcPerComp");
+    return value!.toBigDecimal();
+  }
+
+  set usdcPerComp(value: BigDecimal) {
+    this.set("usdcPerComp", Value.fromBigDecimal(value));
   }
 
   get txCount(): BigInt {
@@ -675,7 +665,8 @@ export class MarketDayData extends Entity {
     this.set("totalReserves", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerEth", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerComp", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("txCount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -804,13 +795,22 @@ export class MarketDayData extends Entity {
     this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
   }
 
-  get ethPerUnderlying(): BigDecimal {
-    let value = this.get("ethPerUnderlying");
+  get usdcPerEth(): BigDecimal {
+    let value = this.get("usdcPerEth");
     return value!.toBigDecimal();
   }
 
-  set ethPerUnderlying(value: BigDecimal) {
-    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
+  set usdcPerEth(value: BigDecimal) {
+    this.set("usdcPerEth", Value.fromBigDecimal(value));
+  }
+
+  get usdcPerComp(): BigDecimal {
+    let value = this.get("usdcPerComp");
+    return value!.toBigDecimal();
+  }
+
+  set usdcPerComp(value: BigDecimal) {
+    this.set("usdcPerComp", Value.fromBigDecimal(value));
   }
 
   get txCount(): BigInt {
@@ -839,7 +839,8 @@ export class MarketWeekData extends Entity {
     this.set("totalReserves", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("utalization", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("usdcPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("ethPerUnderlying", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerEth", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("usdcPerComp", Value.fromBigDecimal(BigDecimal.zero()));
     this.set("txCount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -968,13 +969,22 @@ export class MarketWeekData extends Entity {
     this.set("usdcPerUnderlying", Value.fromBigDecimal(value));
   }
 
-  get ethPerUnderlying(): BigDecimal {
-    let value = this.get("ethPerUnderlying");
+  get usdcPerEth(): BigDecimal {
+    let value = this.get("usdcPerEth");
     return value!.toBigDecimal();
   }
 
-  set ethPerUnderlying(value: BigDecimal) {
-    this.set("ethPerUnderlying", Value.fromBigDecimal(value));
+  set usdcPerEth(value: BigDecimal) {
+    this.set("usdcPerEth", Value.fromBigDecimal(value));
+  }
+
+  get usdcPerComp(): BigDecimal {
+    let value = this.get("usdcPerComp");
+    return value!.toBigDecimal();
+  }
+
+  set usdcPerComp(value: BigDecimal) {
+    this.set("usdcPerComp", Value.fromBigDecimal(value));
   }
 
   get txCount(): BigInt {

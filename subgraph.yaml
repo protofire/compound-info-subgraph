@@ -73,3 +73,6 @@ templates:
                 handler: handleAccrueInterest
               - event: NewReserveFactor(uint256,uint256)
                 handler: handleNewReserveFactor
+graft:
+    base: QmfKmZ7xfT9PRydVGJRRWEdr7rbBcRoKbDyX7fGK7MCq5j
+    block: 9476755

@@ -76,14 +76,10 @@ type Market @entity {
     compSpeedSupply: BigDecimal!
     # COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed
     compSpeedBorrow: BigDecimal!
-    # number of suppliers
-    numberOfSuppliers: BigInt!
-    # number of borrowers
-    numberOfborrowers: BigInt!
-    # price of the underlying token in USDC
+    # number of usdc one underlying token is worth
     usdcPerUnderlying: BigDecimal!
-    # price of the underlying token in ETH
-    ethPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
     # price of COMP token in USDC
     usdcPerComp: BigDecimal!
 
@@ -120,8 +116,11 @@ type MarketHourData @entity {
     utalization: BigDecimal!
     # price of the underlying token in USDC
     usdcPerUnderlying: BigDecimal!
-    # Price of the underlying token in ETH
-    ethPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
+    # price of COMP token in USDC
+    usdcPerComp: BigDecimal!
+
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
 }
@@ -151,8 +150,10 @@ type MarketDayData @entity {
     utalization: BigDecimal!
     # price of the underlying token in USDC
     usdcPerUnderlying: BigDecimal!
-    # Price of the underlying token in ETH
-    ethPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
+    # price of COMP token in USDC
+    usdcPerComp: BigDecimal!
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
 }
@@ -182,8 +183,10 @@ type MarketWeekData @entity {
     utalization: BigDecimal!
     # price of the underlying token in USDC
     usdcPerUnderlying: BigDecimal!
-    # Price of the underlying token in ETH
-    ethPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
+    # price of COMP token in USDC
+    usdcPerComp: BigDecimal!
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
 }

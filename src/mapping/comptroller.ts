@@ -1,5 +1,4 @@
-import { BigDecimal, Address } from "@graphprotocol/graph-ts";
-import { ZERO_BD } from "../utils/constants";
+import { Address } from "@graphprotocol/graph-ts";
 
 import {
     MarketListed as MarketListedEvent,

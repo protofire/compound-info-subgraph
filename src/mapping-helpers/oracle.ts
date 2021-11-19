@@ -1,13 +1,6 @@
-import {
-    Address,
-    BigDecimal,
-    BigInt,
-    ByteArray,
-    Bytes,
-    log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
-import { Market, Protocol } from "../../generated/schema";
+import { Protocol } from "../../generated/schema";
 import { PriceOracle1 } from "../../generated/templates/cToken/PriceOracle1";
 import { PriceOracle2 } from "../../generated/templates/cToken/PriceOracle2";
 
@@ -19,15 +12,91 @@ import {
     CUSDC_ADDRESS,
     USDC_ADDRESS,
     PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER,
+    GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER,
 } from "../utils/constants";
-import { exponentToBigDecimal } from "../utils/utils";
+import { tokenAmountToDecimal } from "../utils/utils";
 
-// Used for all cERC20 contracts
-export function getTokenPrice(
-    blockNumber: BigInt,
-    eventAddress: Address,
+/**
+ * Get the value of eth in USDC
+ * @param blockNumber blockNumber you are currently on, this is used to determine which oracle to use, and how to manipulate the data correctly
+ * @returns value of eth in usdc
+ */
+export function getUsdcPerEth(blockNumber: BigInt): BigDecimal {
+    let usdcPerEth: BigDecimal;
+    if (blockNumber.lt(PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER)) {
+        usdcPerEth = getUsdcPerEthFromOracleOne();
+    } else {
+        usdcPerEth = getUsdcPerEthAfterOracleOne(blockNumber);
+    }
+
+    return usdcPerEth;
+}
+
+/**
+ * Get the value of the underlying token in usdc
+ * @param market the market to get this for
+ * @param blockNumber the block number you are currently on
+ * @param usdcPerEth the value of eth in usdc for this block number, you can get this with getUsdcPerEth
+ * @returns the value of the underlying token in usdc
+ */
+export function getUsdcPerUnderlying(
     underlyingAddress: Address,
-    underlyingDecimals: BigInt
+    cTokenAddress: Address,
+    underlyingDecimals: BigInt,
+    blockNumber: BigInt,
+    usdcPerEth: BigDecimal
+): BigDecimal {
+    let usdcPerUnderlying: BigDecimal;
+    if (blockNumber.lt(PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER)) {
+        usdcPerUnderlying = getUsdcPerUnderlyingFromOracleOne(
+            underlyingAddress,
+            usdcPerEth
+        );
+    } else {
+        usdcPerUnderlying = getUsdcPerUnderlyingAfterOracleOne(
+            cTokenAddress,
+            underlyingDecimals,
+            blockNumber,
+            usdcPerEth
+        );
+    }
+
+    return usdcPerUnderlying;
+}
+
+//// Helpers
+
+function getUsdcPerUnderlyingFromOracleOne(
+    underlyingAddress: Address,
+    usdcPerEth: BigDecimal
+): BigDecimal {
+    const oracleAddress = Address.fromString(PRICE_ORACLE_1_ADDRESS);
+    const oracle = PriceOracle1.bind(oracleAddress);
+
+    // getPrice has a base of eth
+    const ethPerUnderlyingScaled = oracle.try_getPrice(underlyingAddress);
+
+    if (ethPerUnderlyingScaled.reverted) {
+        log.warning("*** ERROR: getUsdcPerEthFromOracleOne failed", []);
+        return ZERO_BD;
+    }
+
+    // Scaled by 10^18 when stored
+    const ethPerUnderlying = tokenAmountToDecimal(
+        ethPerUnderlyingScaled.value,
+        BigInt.fromU32(18)
+    );
+
+    const underlyingPerEth = ONE_BD.div(ethPerUnderlying);
+
+    return underlyingPerEth.div(usdcPerEth);
+}
+
+function getUsdcPerUnderlyingAfterOracleOne(
+    cTokenAddress: Address,
+    underlyingDecimals: BigInt,
+    blockNumber: BigInt,
+    usdcPerEth: BigDecimal
 ): BigDecimal {
     let protocol = Protocol.load(PROTOCOL_ID);
     if (protocol == null) {
@@ -35,123 +104,142 @@ export function getTokenPrice(
         return ZERO_BD;
     }
 
-    let oracleAddress = changetype<Address>(protocol.priceOracle);
-    let underlyingPrice: BigDecimal;
-    let priceOracle1Address = Address.fromString(PRICE_ORACLE_1_ADDRESS);
+    const oracleAddress = changetype<Address>(protocol.priceOracle);
+    const oracle = PriceOracle2.bind(oracleAddress);
 
-    /* PriceOracle2 is used at the block the Comptroller starts using it.
-     * see here https://etherscan.io/address/0x3d9819210a31b4961b30ef54be2aed79b9c9cd3b#events
-     * Search for event topic 0xd52b2b9b7e9ee655fcb95d2e5b9e0c9f69e7ef2b8e9d2d0ea78402d576d22e22,
-     * and see block 7715908.
-     *
-     * This must use the cToken address.
-     *
-     * Note this returns the value without factoring in token decimals and wei, so we must divide
-     * the number by (ethDecimals - tokenDecimals) and again by the mantissa.
-     * USDC would be 10 ^ ((18 - 6) + 18) = 10 ^ 30
-     *
-     * Note that they deployed 3 different PriceOracles at the beginning of the Comptroller,
-     * and that they handle the decimals different, which can break the subgraph. So we actually
-     * defer to Oracle 1 before block 7715908, which works,
-     * until this one is deployed, which was used for 121 days */
-    if (blockNumber.gt(PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER)) {
-        let mantissaDecimalFactor = BigInt.fromI32(36).minus(
-            underlyingDecimals
+    let usdcPerUnderlying: BigDecimal;
+
+    if (
+        blockNumber.lt(
+            GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER
+        )
+    ) {
+        // Before this block number, getUnderlyingPrice uses an eth base
+        const ethPerUnderlingScaled = oracle.try_getUnderlyingPrice(
+            cTokenAddress
         );
-        let bdFactor = exponentToBigDecimal(mantissaDecimalFactor);
-        let oracle2 = PriceOracle2.bind(oracleAddress);
-        let tryPrice = oracle2.try_getUnderlyingPrice(eventAddress);
 
-        underlyingPrice = tryPrice.reverted
-            ? ZERO_BD
-            : tryPrice.value.toBigDecimal().div(bdFactor);
+        if (ethPerUnderlingScaled.reverted) {
+            log.warning(
+                "*** ERROR: getUsdcPerEthAfterOracleOne failed with eth base",
+                []
+            );
+            return ZERO_BD;
+        }
 
-        /* PriceOracle(1) is used (only for the first ~100 blocks of Comptroller. Annoying but we must
-         * handle this. We use it for more than 100 blocks, see reason at top of if statement
-         * of PriceOracle2.
-         *
-         * This must use the token address, not the cToken address.
-         *
-         * Note this returns the value already factoring in token decimals and wei, therefore
-         * we only need to divide by the mantissa, 10^18 */
+        // Unsclaing the value, this is 18 for the scale, 18 for eth decimals, 6 for usdc decimals
+        const ethPerUnderlying = tokenAmountToDecimal(
+            ethPerUnderlingScaled.value,
+            BigInt.fromU32(36).minus(underlyingDecimals)
+        );
+
+        usdcPerUnderlying = ethPerUnderlying.times(usdcPerEth);
     } else {
-        let oracle1 = PriceOracle1.bind(priceOracle1Address);
-        underlyingPrice = oracle1
-            .getPrice(underlyingAddress)
-            .toBigDecimal()
-            .div(exponentToBigDecimal(BigInt.fromI32(18)));
+        // After this block number, getUnderlyingPrice uses usdc as base
+
+        const usdcPerUnderlyingScaled = oracle.try_getUnderlyingPrice(
+            cTokenAddress
+        );
+
+        if (usdcPerUnderlyingScaled.reverted) {
+            log.warning(
+                "*** ERROR: getUsdcPerEthAfterOracleOne failed with usdc base",
+                []
+            );
+            return ZERO_BD;
+        }
+
+        usdcPerUnderlying = tokenAmountToDecimal(
+            usdcPerUnderlyingScaled.value,
+            BigInt.fromU32(18)
+        );
     }
-    return underlyingPrice;
+
+    return usdcPerUnderlying;
 }
 
-// Returns the price of USDC in eth. i.e. 0.005 would mean ETH is $200
-export function getUSDCpriceETH(blockNumber: BigInt): BigDecimal {
-    let protocol = Protocol.load(PROTOCOL_ID);
-    if (protocol == null) {
-        log.warning("*** ERROR: protocl was null in getUSDCpriceETH()", []);
+function getUsdcPerEthFromOracleOne(): BigDecimal {
+    const oracleAddress = Address.fromString(PRICE_ORACLE_1_ADDRESS);
+    const oracle = PriceOracle1.bind(oracleAddress);
+
+    // getPrice has a base of eth
+    const ethPerUsdcScaled = oracle.try_getPrice(
+        Address.fromString(USDC_ADDRESS)
+    );
+
+    if (ethPerUsdcScaled.reverted) {
+        log.warning("*** ERROR: getUsdcPerEthFromOracleOne failed", []);
         return ZERO_BD;
     }
 
-    let oracleAddress = changetype<Address>(protocol.priceOracle);
-    let priceOracle1Address = Address.fromString(
-        "02557a5e05defeffd4cae6d83ea3d173b272c904"
+    // Scaled by 10^18 when stored
+    const ethPerUsdc = tokenAmountToDecimal(
+        ethPerUsdcScaled.value,
+        BigInt.fromU32(18)
     );
-    let usdPrice: BigDecimal;
 
-    // See notes on block number if statement in getTokenPrices()
-    if (blockNumber.gt(PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER)) {
-        let oracle2 = PriceOracle2.bind(oracleAddress);
-        let mantissaDecimalFactorUSDC = BigInt.fromI32(18 - 6 + 18);
-        let bdFactorUSDC = exponentToBigDecimal(mantissaDecimalFactorUSDC);
-        let tryPrice = oracle2.try_getUnderlyingPrice(
+    const usdcPerEth = ONE_BD.div(ethPerUsdc);
+
+    return usdcPerEth;
+}
+
+function getUsdcPerEthAfterOracleOne(blockNumber: BigInt): BigDecimal {
+    let protocol = Protocol.load(PROTOCOL_ID);
+    if (protocol == null) {
+        log.warning("*** ERROR: protocl was null in getTokenPrice()", []);
+        return ZERO_BD;
+    }
+
+    const oracleAddress = changetype<Address>(protocol.priceOracle);
+    const oracle = PriceOracle2.bind(oracleAddress);
+
+    let usdcPerEth: BigDecimal;
+
+    if (
+        blockNumber.lt(
+            GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER
+        )
+    ) {
+        // Before this block number, getUnderlyingPrice uses an eth base
+        const ethPerUsdcScaled = oracle.try_getUnderlyingPrice(
             Address.fromString(CUSDC_ADDRESS)
         );
 
-        usdPrice = tryPrice.reverted
-            ? ZERO_BD
-            : tryPrice.value.toBigDecimal().div(bdFactorUSDC);
-    } else {
-        let oracle1 = PriceOracle1.bind(priceOracle1Address);
-        usdPrice = oracle1
-            .getPrice(Address.fromString(USDC_ADDRESS))
-            .toBigDecimal()
-            .div(exponentToBigDecimal(BigInt.fromI32(18)));
-    }
-    return usdPrice;
-}
+        if (ethPerUsdcScaled.reverted) {
+            log.warning(
+                "*** ERROR: getUsdcPerEthAfterOracleOne failed with eth base",
+                []
+            );
+            return ZERO_BD;
+        }
 
-// Only to be used after block 10678764, since it's aimed to fix the change to USD based price oracle.
-export function getETHinUSD(blockNumber: BigInt): BigDecimal {
-    const protocol = Protocol.load(PROTOCOL_ID);
-    if (protocol == null) {
-        log.warning("*** ERROR: protocol was null in getETHinUSD()", []);
-        return ZERO_BD;
-    }
-
-    if (blockNumber.lt(BigInt.fromI32(10678764))) {
-        log.warning(
-            "*** ERROR: getETHinUSD was called before block 10678764",
-            []
+        // Unsclaing the value, this is 18 for the scale, 18 for eth decimals, 6 for usdc decimals
+        const ethPerUsdc = tokenAmountToDecimal(
+            ethPerUsdcScaled.value,
+            BigInt.fromU32(18 - 6 + 18)
         );
-        return ZERO_BD;
+
+        usdcPerEth = ONE_BD.div(ethPerUsdc);
+    } else {
+        // After this block number, getUnderlyingPrice uses usdc as base
+
+        const usdcPerEthScaled = oracle.try_getUnderlyingPrice(
+            Address.fromString(CETH_ADDRESS)
+        );
+
+        if (usdcPerEthScaled.reverted) {
+            log.warning(
+                "*** ERROR: getUsdcPerEthAfterOracleOne failed with usdc base",
+                []
+            );
+            return ZERO_BD;
+        }
+
+        usdcPerEth = tokenAmountToDecimal(
+            usdcPerEthScaled.value,
+            BigInt.fromU32(18)
+        );
     }
 
-    let oracleAddress = changetype<Address>(protocol.priceOracle);
-    let oracle = PriceOracle2.bind(oracleAddress);
-    let tryPrice = oracle.try_getUnderlyingPrice(
-        Address.fromString(CETH_ADDRESS)
-    );
-
-    let ethPriceInUSD = tryPrice.reverted
-        ? ZERO_BD
-        : tryPrice.value
-              .toBigDecimal()
-              .div(exponentToBigDecimal(BigInt.fromI32(18)));
-
-    return ethPriceInUSD;
-}
-
-export function getCOMPinUSD(blockNumber: BigInt): BigDecimal {
-    // TODO: implement this!
-    return ONE_BD;
+    return usdcPerEth;
 }

@@ -42,18 +42,20 @@ type Market @entity {
     underlyingAddress: Bytes!
     # number of decimals of the underlying token
     underlyingDecimals: BigInt!
+    # comptroller address
+    comptrollerAddress: Bytes!
     # collator factor in decimal form
     collatoralFactor: BigDecimal!
     # reserve factor in decimal form
     reserveFactor: BigDecimal!
     # amount of underlying owned by the contract
     cash: BigDecimal!
-    # how much underlying one cToken is worth
-    exchangeRate: BigDecimal!
-    # Supply rate per block
-    supplyRate: BigDecimal!
-    # Borrow rate per block
-    borrowRate: BigDecimal!
+    # price of underlying tokens in cTokens
+    cTokenPerUnderlying: BigDecimal!
+    # supply rate per block, this is the value from the contract with the 10^18 scaling removed
+    supplyRatePerBlock: BigDecimal!
+    # borrow rate per block, this is the value from the contract with the 10^18 scaling removed
+    borrowRatePerBlock: BigDecimal!
     # supply apy not including the COMP distribution in decimal form
     supplyApy: BigDecimal!
     # borrow apy not including the COMP distribution in decimal form
@@ -70,14 +72,16 @@ type Market @entity {
     totalReserves: BigDecimal!
     # utalization
     utalization: BigDecimal!
-    # number of suppliers
-    numberOfSuppliers: BigInt!
-    # number of borrowers
-    numberOfborrowers: BigInt!
-    # price of the underlying token in USDC
+    # COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed
+    compSpeedSupply: BigDecimal!
+    # COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed
+    compSpeedBorrow: BigDecimal!
+    # number of usdc one underlying token is worth
     usdcPerUnderlying: BigDecimal!
-    # Price of the underlying token in ETH
-    ethPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
+    # price of COMP token in USDC
+    usdcPerComp: BigDecimal!
 
     # historical data in hourly intervals
     historicalHourData: [MarketHourData!]! @derivedFrom(field: "market")
@@ -110,6 +114,13 @@ type MarketHourData @entity {
     totalReserves: BigDecimal!
     # utalization
     utalization: BigDecimal!
+    # price of the underlying token in USDC
+    usdcPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
+    # price of COMP token in USDC
+    usdcPerComp: BigDecimal!
+
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
 }
@@ -137,6 +148,12 @@ type MarketDayData @entity {
     totalReserves: BigDecimal!
     # utalization
     utalization: BigDecimal!
+    # price of the underlying token in USDC
+    usdcPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
+    # price of COMP token in USDC
+    usdcPerComp: BigDecimal!
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
 }
@@ -164,6 +181,12 @@ type MarketWeekData @entity {
     totalReserves: BigDecimal!
     # utalization
     utalization: BigDecimal!
+    # price of the underlying token in USDC
+    usdcPerUnderlying: BigDecimal!
+    # number of usdc one eth is worth
+    usdcPerEth: BigDecimal!
+    # price of COMP token in USDC
+    usdcPerComp: BigDecimal!
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
 }

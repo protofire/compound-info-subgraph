@@ -10,6 +10,8 @@ export const CETH_ADDRESS = "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5";
 export const SAI_ADDRESS = "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359";
 export const USDC_ADDRESS = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const CUSDC_ADDRESS = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
+export const COMP_ADDRESS = "0xc00e94Cb662C3520282E6f5717214004A7f26888";
+export const CCOMP_ADDRESS = "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4";
 export const PRICE_ORACLE_1_ADDRESS =
     "0x02557a5e05defeffd4cae6d83ea3d173b272c904"; // Used for ~100 blocks at the beginning of the protocol
 
@@ -20,6 +22,9 @@ export const SEC_PER_DAY = BigInt.fromU32(86400);
 export const SEC_PER_WEEK = BigInt.fromU32(604800);
 
 export const PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER = BigInt.fromU32(7715908);
+export const GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER = BigInt.fromU32(
+    10678764
+);
 
 export const SEC_PER_BLOCK = BigDecimal.fromString("13.5");
 export const DAYS_PER_YEAR = BigInt.fromU32(365);

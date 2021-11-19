@@ -1,27 +1,8 @@
-import {
-    Address,
-    BigDecimal,
-    BigInt,
-    ByteArray,
-    Bytes,
-    log,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, log } from "@graphprotocol/graph-ts";
 
 import { Protocol, Market } from "../../generated/schema";
-import { CToken } from "../../generated/templates/cToken/cToken";
-import { ERC20 } from "../../generated/templates/cToken/ERC20";
 
-import {
-    ETH_ADDRESS,
-    CETH_ADDRESS,
-    SAI_ADDRESS,
-    CUSDC_ADDRESS,
-    PROTOCOL_ID,
-    ZERO_BI,
-    ZERO_BD,
-} from "../utils/constants";
-import { getTokenPrice, getETHinUSD, getUSDCpriceETH } from "./oracle";
-import { exponentToBigDecimal, tokenAmountToDecimal } from "../utils/utils";
+import { PROTOCOL_ID, ZERO_BD } from "../utils/constants";
 
 /**
  * Helper function to create a new protocol
