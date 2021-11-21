@@ -74,5 +74,5 @@ templates:
         - event: NewReserveFactor(uint256,uint256)
           handler: handleNewReserveFactor
 graft:
-  base: QmfKmZ7xfT9PRydVGJRRWEdr7rbBcRoKbDyX7fGK7MCq5j
-  block: 9476755
+  base: QmdBSuNyRaP91mF8SUW2K9ykVFE7nnKZbK9VR9jnMydLuM
+  block: 9857499

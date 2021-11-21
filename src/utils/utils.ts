@@ -3,6 +3,7 @@ import { BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
 import {
     ZERO_BI,
     ONE_BI,
+    ZERO_BD,
     ONE_BD,
     BLOCKS_PER_DAY,
     DAYS_PER_YEAR,
@@ -45,11 +46,12 @@ export function calculateCompDistrubtionApy(
     usdcPerUnderlying: BigDecimal
 ): BigDecimal {
     const compDistributionPerDay = compSpeed.times(BLOCKS_PER_DAY);
-    const base = ONE_BD.plus(
-        usdcPerComp
-            .times(compDistributionPerDay)
-            .div(totalSupplyOrBorrow.times(usdcPerUnderlying))
-    );
+
+    const denom = totalSupplyOrBorrow.times(usdcPerUnderlying);
+
+    const base = denom.notEqual(ZERO_BD)
+        ? ONE_BD.plus(usdcPerComp.times(compDistributionPerDay).div(denom))
+        : ZERO_BD;
 
     let apy = BigDecimal.fromString("1");
     for (let i = ZERO_BI; i.lt(DAYS_PER_YEAR); i = i.plus(ONE_BI)) {

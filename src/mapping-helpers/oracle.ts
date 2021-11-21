@@ -87,9 +87,13 @@ function getUsdcPerUnderlyingFromOracleOne(
         BigInt.fromU32(18)
     );
 
-    const underlyingPerEth = ONE_BD.div(ethPerUnderlying);
+    const underlyingPerEth = ethPerUnderlying.notEqual(ZERO_BD)
+        ? ONE_BD.div(ethPerUnderlying)
+        : ZERO_BD;
 
-    return underlyingPerEth.div(usdcPerEth);
+    return usdcPerEth.notEqual(ZERO_BD)
+        ? underlyingPerEth.div(usdcPerEth)
+        : ZERO_BD;
 }
 
 function getUsdcPerUnderlyingAfterOracleOne(
@@ -120,8 +124,9 @@ function getUsdcPerUnderlyingAfterOracleOne(
         );
 
         if (ethPerUnderlingScaled.reverted) {
+            // Expect to get this when we ask for COMP price, but COMP doesn't exist yet
             log.warning(
-                "*** ERROR: getUsdcPerEthAfterOracleOne failed with eth base",
+                `*** ERROR: getUsdcPerEthAfterOracleOne failed with eth base for: ${cTokenAddress.toHexString()}`,
                 []
             );
             return ZERO_BD;
@@ -143,7 +148,7 @@ function getUsdcPerUnderlyingAfterOracleOne(
 
         if (usdcPerUnderlyingScaled.reverted) {
             log.warning(
-                "*** ERROR: getUsdcPerEthAfterOracleOne failed with usdc base",
+                `*** ERROR: getUsdcPerEthAfterOracleOne failed with usdc base for ${cTokenAddress.toHexString()}`,
                 []
             );
             return ZERO_BD;
@@ -178,7 +183,9 @@ function getUsdcPerEthFromOracleOne(): BigDecimal {
         BigInt.fromU32(18)
     );
 
-    const usdcPerEth = ONE_BD.div(ethPerUsdc);
+    const usdcPerEth = ethPerUsdc.notEqual(ZERO_BD)
+        ? ONE_BD.div(ethPerUsdc)
+        : ZERO_BD;
 
     return usdcPerEth;
 }
@@ -219,7 +226,9 @@ function getUsdcPerEthAfterOracleOne(blockNumber: BigInt): BigDecimal {
             BigInt.fromU32(18 - 6 + 18)
         );
 
-        usdcPerEth = ONE_BD.div(ethPerUsdc);
+        usdcPerEth = ethPerUsdc.notEqual(ZERO_BD)
+            ? ONE_BD.div(ethPerUsdc)
+            : ZERO_BD;
     } else {
         // After this block number, getUnderlyingPrice uses usdc as base
 

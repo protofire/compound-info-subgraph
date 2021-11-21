@@ -165,7 +165,9 @@ export function updateMarket(
             market.underlyingDecimals
         );
 
-        market.utalization = market.totalBorrow.div(market.totalSupply);
+        market.utalization = market.totalSupply.notEqual(ZERO_BD)
+            ? market.totalBorrow.div(market.totalSupply)
+            : ZERO_BD;
 
         market.totalBorrow = tokenAmountToDecimal(
             contract.totalBorrows(),
@@ -198,15 +200,33 @@ export function updateMarket(
             changetype<Address>(market.comptrollerAddress)
         );
 
-        // Comp speeds with the 10^18 scaling removed
-        market.compSpeedSupply = tokenAmountToDecimal(
-            comptrollerContract.compSupplySpeeds(marketAddress),
-            BigInt.fromU32(18)
+        const tryCompSupplySpeeds = comptrollerContract.try_compSupplySpeeds(
+            marketAddress
         );
-        market.compSpeedBorrow = tokenAmountToDecimal(
-            comptrollerContract.compBorrowSpeeds(marketAddress),
-            BigInt.fromU32(18)
+
+        if (tryCompSupplySpeeds.reverted) {
+            market.compSpeedSupply = ZERO_BD;
+        } else {
+            // Comp speeds with the 10^18 scaling removed
+            market.compSpeedSupply = tokenAmountToDecimal(
+                comptrollerContract.compSupplySpeeds(marketAddress),
+                BigInt.fromU32(18)
+            );
+        }
+
+        const try_compBorrowSpeeds = comptrollerContract.try_compBorrowSpeeds(
+            marketAddress
         );
+
+        if (try_compBorrowSpeeds.reverted) {
+            market.compSpeedBorrow = ZERO_BD;
+        } else {
+            // Comp speeds with the 10^18 scaling removed
+            market.compSpeedBorrow = tokenAmountToDecimal(
+                comptrollerContract.compBorrowSpeeds(marketAddress),
+                BigInt.fromU32(18)
+            );
+        }
 
         const compSupplyApy = calculateCompDistrubtionApy(
             market.totalSupply,
