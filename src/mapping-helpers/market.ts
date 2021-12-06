@@ -160,9 +160,17 @@ export function updateMarket(
             market.cTokenDecimals
         ).times(market.cTokenPerUnderlying);
 
+        market.totalSupplyUsd = market.totalSupply.times(
+            market.usdcPerUnderlying
+        );
+
         market.totalReserves = tokenAmountToDecimal(
             contract.totalReserves(),
             market.underlyingDecimals
+        );
+
+        market.totalReservesUsd = market.totalReserves.times(
+            market.usdcPerUnderlying
         );
 
         market.utalization = market.totalSupply.notEqual(ZERO_BD)
@@ -172,6 +180,10 @@ export function updateMarket(
         market.totalBorrow = tokenAmountToDecimal(
             contract.totalBorrows(),
             market.underlyingDecimals
+        );
+
+        market.totalBorrowUsd = market.totalBorrow.times(
+            market.usdcPerUnderlying
         );
 
         market.cash = tokenAmountToDecimal(

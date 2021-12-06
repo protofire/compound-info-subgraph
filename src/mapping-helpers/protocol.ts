@@ -1,4 +1,4 @@
-import { Address, BigInt, log } from "@graphprotocol/graph-ts";
+import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
 import { Protocol, Market } from "../../generated/schema";
 
@@ -58,20 +58,21 @@ export function updateProtocolSummaryData(blockNumber: BigInt): void {
         const market = Market.load(marketId);
 
         if (market != null) {
-            const usdcPerUnderlying = market.usdcPerUnderlying;
+            // TODO: remove null checks and casting before I rerun (will make these required)
+            if (market.totalSupplyUsd !== null) {
+                const val = changetype<BigDecimal>(market.totalSupplyUsd);
+                totalSupplyUsd = totalSupplyUsd.plus(val);
+            }
 
-            totalSupplyUsd = totalSupplyUsd.plus(
-                market.totalSupply.times(usdcPerUnderlying)
-            );
-            totalBorrowUsd = totalBorrowUsd.plus(
-                market.totalBorrow.times(usdcPerUnderlying)
-            );
-            totalReservesUsd = totalReservesUsd.plus(
-                market.totalReserves.times(usdcPerUnderlying)
-            );
-            totalSupplyUsd = totalSupplyUsd.plus(
-                market.totalSupply.times(usdcPerUnderlying)
-            );
+            if (market.totalBorrowUsd !== null) {
+                const val = changetype<BigDecimal>(market.totalBorrowUsd);
+                totalBorrowUsd = totalBorrowUsd.plus(val);
+            }
+
+            if (market.totalReservesUsd !== null) {
+                const val = changetype<BigDecimal>(market.totalReservesUsd);
+                totalReservesUsd = totalReservesUsd.plus(val);
+            }
         } else {
             // Won't happen
             log.warning(

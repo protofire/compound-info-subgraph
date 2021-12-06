@@ -315,6 +315,7 @@ export function updateProtocolWeekData(event: ethereum.Event): void {
     if (protocolData == null) {
         // Make a new one for this ID
         protocolData = new ProtocolWeekData(weekDataId);
+        protocolData.protocol = PROTOCOL_ID;
         protocolData.date = weekStartTimestamp;
 
         // Set defaults

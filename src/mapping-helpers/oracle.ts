@@ -156,7 +156,7 @@ function getUsdcPerUnderlyingAfterOracleOne(
 
         usdcPerUnderlying = tokenAmountToDecimal(
             usdcPerUnderlyingScaled.value,
-            BigInt.fromU32(18)
+            BigInt.fromU32(36).minus(underlyingDecimals)
         );
     }
 

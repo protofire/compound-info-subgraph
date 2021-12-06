@@ -375,6 +375,23 @@ export class Market extends Entity {
     this.set("totalSupply", Value.fromBigDecimal(value));
   }
 
+  get totalSupplyUsd(): BigDecimal | null {
+    let value = this.get("totalSupplyUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalSupplyUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalSupplyUsd");
+    } else {
+      this.set("totalSupplyUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalBorrow(): BigDecimal {
     let value = this.get("totalBorrow");
     return value!.toBigDecimal();
@@ -384,6 +401,23 @@ export class Market extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(value));
   }
 
+  get totalBorrowUsd(): BigDecimal | null {
+    let value = this.get("totalBorrowUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalBorrowUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalBorrowUsd");
+    } else {
+      this.set("totalBorrowUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalReserves(): BigDecimal {
     let value = this.get("totalReserves");
     return value!.toBigDecimal();
@@ -391,6 +425,23 @@ export class Market extends Entity {
 
   set totalReserves(value: BigDecimal) {
     this.set("totalReserves", Value.fromBigDecimal(value));
+  }
+
+  get totalReservesUsd(): BigDecimal | null {
+    let value = this.get("totalReservesUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalReservesUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalReservesUsd");
+    } else {
+      this.set("totalReservesUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
   }
 
   get utalization(): BigDecimal {
@@ -585,6 +636,23 @@ export class MarketHourData extends Entity {
     this.set("totalSupply", Value.fromBigDecimal(value));
   }
 
+  get totalSupplyUsd(): BigDecimal | null {
+    let value = this.get("totalSupplyUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalSupplyUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalSupplyUsd");
+    } else {
+      this.set("totalSupplyUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalBorrow(): BigDecimal {
     let value = this.get("totalBorrow");
     return value!.toBigDecimal();
@@ -594,6 +662,23 @@ export class MarketHourData extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(value));
   }
 
+  get totalBorrowUsd(): BigDecimal | null {
+    let value = this.get("totalBorrowUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalBorrowUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalBorrowUsd");
+    } else {
+      this.set("totalBorrowUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalReserves(): BigDecimal {
     let value = this.get("totalReserves");
     return value!.toBigDecimal();
@@ -601,6 +686,23 @@ export class MarketHourData extends Entity {
 
   set totalReserves(value: BigDecimal) {
     this.set("totalReserves", Value.fromBigDecimal(value));
+  }
+
+  get totalReservesUsd(): BigDecimal | null {
+    let value = this.get("totalReservesUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalReservesUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalReservesUsd");
+    } else {
+      this.set("totalReservesUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
   }
 
   get utalization(): BigDecimal {
@@ -759,6 +861,23 @@ export class MarketDayData extends Entity {
     this.set("totalSupply", Value.fromBigDecimal(value));
   }
 
+  get totalSupplyUsd(): BigDecimal | null {
+    let value = this.get("totalSupplyUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalSupplyUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalSupplyUsd");
+    } else {
+      this.set("totalSupplyUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalBorrow(): BigDecimal {
     let value = this.get("totalBorrow");
     return value!.toBigDecimal();
@@ -768,6 +887,23 @@ export class MarketDayData extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(value));
   }
 
+  get totalBorrowUsd(): BigDecimal | null {
+    let value = this.get("totalBorrowUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalBorrowUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalBorrowUsd");
+    } else {
+      this.set("totalBorrowUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalReserves(): BigDecimal {
     let value = this.get("totalReserves");
     return value!.toBigDecimal();
@@ -775,6 +911,23 @@ export class MarketDayData extends Entity {
 
   set totalReserves(value: BigDecimal) {
     this.set("totalReserves", Value.fromBigDecimal(value));
+  }
+
+  get totalReservesUsd(): BigDecimal | null {
+    let value = this.get("totalReservesUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalReservesUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalReservesUsd");
+    } else {
+      this.set("totalReservesUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
   }
 
   get utalization(): BigDecimal {
@@ -933,6 +1086,23 @@ export class MarketWeekData extends Entity {
     this.set("totalSupply", Value.fromBigDecimal(value));
   }
 
+  get totalSupplyUsd(): BigDecimal | null {
+    let value = this.get("totalSupplyUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalSupplyUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalSupplyUsd");
+    } else {
+      this.set("totalSupplyUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalBorrow(): BigDecimal {
     let value = this.get("totalBorrow");
     return value!.toBigDecimal();
@@ -942,6 +1112,23 @@ export class MarketWeekData extends Entity {
     this.set("totalBorrow", Value.fromBigDecimal(value));
   }
 
+  get totalBorrowUsd(): BigDecimal | null {
+    let value = this.get("totalBorrowUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalBorrowUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalBorrowUsd");
+    } else {
+      this.set("totalBorrowUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
+  }
+
   get totalReserves(): BigDecimal {
     let value = this.get("totalReserves");
     return value!.toBigDecimal();
@@ -949,6 +1136,23 @@ export class MarketWeekData extends Entity {
 
   set totalReserves(value: BigDecimal) {
     this.set("totalReserves", Value.fromBigDecimal(value));
+  }
+
+  get totalReservesUsd(): BigDecimal | null {
+    let value = this.get("totalReservesUsd");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set totalReservesUsd(value: BigDecimal | null) {
+    if (!value) {
+      this.unset("totalReservesUsd");
+    } else {
+      this.set("totalReservesUsd", Value.fromBigDecimal(<BigDecimal>value));
+    }
   }
 
   get utalization(): BigDecimal {
