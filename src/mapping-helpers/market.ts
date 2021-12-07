@@ -17,6 +17,7 @@ import {
     ZERO_BD,
     ONE_BD,
     SEC_PER_BLOCK,
+    MKR_ADDRESS,
 } from "../utils/constants";
 import { getUsdcPerEth, getUsdcPerUnderlying } from "./oracle";
 import {
@@ -70,13 +71,17 @@ export function createMarket(
         const underlyingContract = ERC20.bind(underlyingAddress);
         market.underlyingAddress = underlyingAddress;
 
-        if (market.underlyingAddress.toHexString() != SAI_ADDRESS) {
-            market.underlyingName = underlyingContract.name();
-            market.underlyingSymbol = underlyingContract.symbol();
-        } else {
+        if (underlyingAddress.toHexString() == SAI_ADDRESS) {
             // SAI contract returns garbage for name and symbol
             market.underlyingName = "Sai Stablecoin v1.0 (SAI)";
             market.underlyingSymbol = "SAI";
+        } else if (underlyingAddress.toHexString() == MKR_ADDRESS) {
+            // MKR contract returns garbage for name and symbol
+            market.underlyingName = "Maker token";
+            market.underlyingSymbol = "MKR";
+        } else {
+            market.underlyingName = underlyingContract.name();
+            market.underlyingSymbol = underlyingContract.symbol();
         }
 
         market.underlyingDecimals = BigInt.fromI32(
