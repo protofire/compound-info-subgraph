@@ -16,8 +16,8 @@ type Protocol @entity {
     totalBorrowUsd: BigDecimal!
     # total reserves of the entire protocol in USD
     totalReservesUsd: BigDecimal!
-    # utalization of the entire protocol
-    utalization: BigDecimal!
+    # utilization of the entire protocol
+    utilization: BigDecimal!
 
     # historical data in weekly intervals of the entire protocol
     historicalWeekData: [ProtocolWeekData!]! @derivedFrom(field: "protocol")
@@ -45,9 +45,11 @@ type Market @entity {
     # comptroller address
     comptrollerAddress: Bytes!
     # collator factor in decimal form
-    collatoralFactor: BigDecimal!
+    collateralFactor: BigDecimal!
     # reserve factor in decimal form
     reserveFactor: BigDecimal!
+    # borrow cap in underlying tokens
+    borrowCap: BigDecimal!
     # amount of underlying owned by the contract
     cash: BigDecimal!
     # price of underlying tokens in cTokens
@@ -66,18 +68,22 @@ type Market @entity {
     totalBorrowApy: BigDecimal!
     # total amount of underlying tokens supplied
     totalSupply: BigDecimal!
-    # total amount supplied in USD -- TODO: change to required when I rerun
-    totalSupplyUsd: BigDecimal
+    # total amount supplied in USD
+    totalSupplyUsd: BigDecimal!
     # total amount of underlying tokens borrowed
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD -- TODO: change to required when I rerun
-    totalBorrowUsd: BigDecimal
+    # total amount borrowed in USD
+    totalBorrowUsd: BigDecimal!
     # total amount of underlying token in reserves
     totalReserves: BigDecimal!
-    # total amount in reserves in USD -- TODO: change to required when I rerun
-    totalReservesUsd: BigDecimal
-    # utalization
-    utalization: BigDecimal!
+    # total amount in reserves in USD
+    totalReservesUsd: BigDecimal!
+    # total available to be borrowed in the underlying asset
+    availableLiquidity: BigDecimal!
+    # total available to be borrowed in USD
+    availableLiquidityUsd: BigDecimal!
+    # utilization
+    utilization: BigDecimal!
     # COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed
     compSpeedSupply: BigDecimal!
     # COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed
@@ -114,18 +120,18 @@ type MarketHourData @entity {
     totalBorrowApy: BigDecimal!
     # total amount of underlying tokens supplied over time
     totalSupply: BigDecimal!
-    # total amount supplied in USD -- TODO: change to required when I rerun
-    totalSupplyUsd: BigDecimal
+    # total amount supplied in USD
+    totalSupplyUsd: BigDecimal!
     # total amount of underlying tokens borrowed over time
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD -- TODO: change to required when I rerun
-    totalBorrowUsd: BigDecimal
+    # total amount borrowed in USD
+    totalBorrowUsd: BigDecimal!
     # total amount of underlying token in reserves over time
     totalReserves: BigDecimal!
-    # total amount in reseres in USD -- TODO: change to required when I rerun
-    totalReservesUsd: BigDecimal
-    # utalization
-    utalization: BigDecimal!
+    # total amount in reseres in USD
+    totalReservesUsd: BigDecimal!
+    # utilization
+    utilization: BigDecimal!
     # price of the underlying token in USDC
     usdcPerUnderlying: BigDecimal!
     # number of usdc one eth is worth
@@ -154,18 +160,18 @@ type MarketDayData @entity {
     totalBorrowApy: BigDecimal!
     # total amount of underlying tokens supplied over time
     totalSupply: BigDecimal!
-    # total amount supplied in USD -- TODO: change to required when I rerun
-    totalSupplyUsd: BigDecimal
+    # total amount supplied in USD
+    totalSupplyUsd: BigDecimal!
     # total amount of underlying tokens borrowed over time
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD -- TODO: change to required when I rerun
-    totalBorrowUsd: BigDecimal
+    # total amount borrowed in USD
+    totalBorrowUsd: BigDecimal!
     # total amount of underlying token in reserves over time
     totalReserves: BigDecimal!
-    # total amount in reseres in USD -- TODO: change to required when I rerun
-    totalReservesUsd: BigDecimal
-    # utalization
-    utalization: BigDecimal!
+    # total amount in reseres in USD
+    totalReservesUsd: BigDecimal!
+    # utilization
+    utilization: BigDecimal!
     # price of the underlying token in USDC
     usdcPerUnderlying: BigDecimal!
     # number of usdc one eth is worth
@@ -193,18 +199,18 @@ type MarketWeekData @entity {
     totalBorrowApy: BigDecimal!
     # total amount of underlying tokens supplied over time
     totalSupply: BigDecimal!
-    # total amount supplied in USD -- TODO: change to required when I rerun
-    totalSupplyUsd: BigDecimal
+    # total amount supplied in USD
+    totalSupplyUsd: BigDecimal!
     # total amount of underlying tokens borrowed over time
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD -- TODO: change to required when I rerun
-    totalBorrowUsd: BigDecimal
+    # total amount borrowed in USD
+    totalBorrowUsd: BigDecimal!
     # total amount of underlying token in reserves over time
     totalReserves: BigDecimal!
-    # total amount in reseres in USD -- TODO: change to required when I rerun
-    totalReservesUsd: BigDecimal
-    # utalization
-    utalization: BigDecimal!
+    # total amount in reseres in USD
+    totalReservesUsd: BigDecimal!
+    # utilization
+    utilization: BigDecimal!
     # price of the underlying token in USDC
     usdcPerUnderlying: BigDecimal!
     # number of usdc one eth is worth
@@ -228,8 +234,8 @@ type ProtocolWeekData @entity {
     totalBorrowUsd: BigDecimal!
     # total amount of reserves in USD of the entire protocol
     totalReservesUsd: BigDecimal!
-    # utalization
-    utalization: BigDecimal!
+    # utilization
+    utilization: BigDecimal!
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
 }

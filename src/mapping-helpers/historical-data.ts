@@ -47,9 +47,12 @@ export function updateMarketHourData(event: ethereum.Event): void {
         marketData.totalSupplyApy = ZERO_BD;
         marketData.totalBorrowApy = ZERO_BD;
         marketData.totalSupply = ZERO_BD;
+        marketData.totalSupplyUsd = ZERO_BD;
         marketData.totalBorrow = ZERO_BD;
+        marketData.totalBorrowUsd = ZERO_BD;
         marketData.totalReserves = ZERO_BD;
-        marketData.utalization = ZERO_BD;
+        marketData.totalReservesUsd = ZERO_BD;
+        marketData.utilization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
         marketData.txCount = ZERO_BI;
@@ -80,17 +83,29 @@ export function updateMarketHourData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.totalSupply.times(newValueWeigth));
 
+    marketData.totalSupplyUsd = marketData.totalSupplyUsd
+        .times(oldValueWeight)
+        .plus(market.totalSupplyUsd.times(newValueWeigth));
+
     marketData.totalBorrow = marketData.totalBorrow
         .times(oldValueWeight)
         .plus(market.totalBorrow.times(newValueWeigth));
+
+    marketData.totalBorrowUsd = marketData.totalBorrowUsd
+        .times(oldValueWeight)
+        .plus(market.totalBorrowUsd.times(newValueWeigth));
 
     marketData.totalReserves = marketData.totalReserves
         .times(oldValueWeight)
         .plus(market.totalReserves.times(newValueWeigth));
 
-    marketData.utalization = marketData.utalization
+    marketData.totalReservesUsd = marketData.totalReservesUsd
         .times(oldValueWeight)
-        .plus(market.utalization.times(newValueWeigth));
+        .plus(market.totalReservesUsd.times(newValueWeigth));
+
+    marketData.utilization = marketData.utilization
+        .times(oldValueWeight)
+        .plus(market.utilization.times(newValueWeigth));
 
     marketData.usdcPerUnderlying = marketData.usdcPerUnderlying
         .times(oldValueWeight)
@@ -142,9 +157,12 @@ export function updateMarketDayData(event: ethereum.Event): void {
         marketData.totalSupplyApy = ZERO_BD;
         marketData.totalBorrowApy = ZERO_BD;
         marketData.totalSupply = ZERO_BD;
+        marketData.totalSupplyUsd = ZERO_BD;
         marketData.totalBorrow = ZERO_BD;
+        marketData.totalBorrowUsd = ZERO_BD;
         marketData.totalReserves = ZERO_BD;
-        marketData.utalization = ZERO_BD;
+        marketData.totalReservesUsd = ZERO_BD;
+        marketData.utilization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
         marketData.txCount = ZERO_BI;
@@ -175,17 +193,29 @@ export function updateMarketDayData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.totalSupply.times(newValueWeigth));
 
+    marketData.totalSupplyUsd = marketData.totalSupplyUsd
+        .times(oldValueWeight)
+        .plus(market.totalSupplyUsd.times(newValueWeigth));
+
     marketData.totalBorrow = marketData.totalBorrow
         .times(oldValueWeight)
         .plus(market.totalBorrow.times(newValueWeigth));
+
+    marketData.totalBorrowUsd = marketData.totalBorrowUsd
+        .times(oldValueWeight)
+        .plus(market.totalBorrowUsd.times(newValueWeigth));
 
     marketData.totalReserves = marketData.totalReserves
         .times(oldValueWeight)
         .plus(market.totalReserves.times(newValueWeigth));
 
-    marketData.utalization = marketData.utalization
+    marketData.totalReservesUsd = marketData.totalReservesUsd
         .times(oldValueWeight)
-        .plus(market.utalization.times(newValueWeigth));
+        .plus(market.totalReservesUsd.times(newValueWeigth));
+
+    marketData.utilization = marketData.utilization
+        .times(oldValueWeight)
+        .plus(market.utilization.times(newValueWeigth));
 
     marketData.usdcPerUnderlying = marketData.usdcPerUnderlying
         .times(oldValueWeight)
@@ -232,9 +262,12 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         marketData.totalSupplyApy = ZERO_BD;
         marketData.totalBorrowApy = ZERO_BD;
         marketData.totalSupply = ZERO_BD;
+        marketData.totalSupplyUsd = ZERO_BD;
         marketData.totalBorrow = ZERO_BD;
+        marketData.totalBorrowUsd = ZERO_BD;
         marketData.totalReserves = ZERO_BD;
-        marketData.utalization = ZERO_BD;
+        marketData.totalReservesUsd = ZERO_BD;
+        marketData.utilization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
         marketData.txCount = ZERO_BI;
@@ -265,17 +298,29 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.totalSupply.times(newValueWeigth));
 
+    marketData.totalSupplyUsd = marketData.totalSupplyUsd
+        .times(oldValueWeight)
+        .plus(market.totalSupplyUsd.times(newValueWeigth));
+
     marketData.totalBorrow = marketData.totalBorrow
         .times(oldValueWeight)
         .plus(market.totalBorrow.times(newValueWeigth));
+
+    marketData.totalBorrowUsd = marketData.totalBorrowUsd
+        .times(oldValueWeight)
+        .plus(market.totalBorrowUsd.times(newValueWeigth));
 
     marketData.totalReserves = marketData.totalReserves
         .times(oldValueWeight)
         .plus(market.totalReserves.times(newValueWeigth));
 
-    marketData.utalization = marketData.utalization
+    marketData.totalReservesUsd = marketData.totalReservesUsd
         .times(oldValueWeight)
-        .plus(market.utalization.times(newValueWeigth));
+        .plus(market.totalReservesUsd.times(newValueWeigth));
+
+    marketData.utilization = marketData.utilization
+        .times(oldValueWeight)
+        .plus(market.utilization.times(newValueWeigth));
 
     marketData.usdcPerUnderlying = marketData.usdcPerUnderlying
         .times(oldValueWeight)
@@ -322,7 +367,7 @@ export function updateProtocolWeekData(event: ethereum.Event): void {
         protocolData.totalSupplyUsd = ZERO_BD;
         protocolData.totalBorrowUsd = ZERO_BD;
         protocolData.totalReservesUsd = ZERO_BD;
-        protocolData.utalization = ZERO_BD;
+        protocolData.utilization = ZERO_BD;
         protocolData.txCount = ZERO_BI;
     }
 
@@ -343,9 +388,9 @@ export function updateProtocolWeekData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(protocol.totalReservesUsd.times(newValueWeigth));
 
-    protocolData.utalization = protocolData.utalization
+    protocolData.utilization = protocolData.utilization
         .times(oldValueWeight)
-        .plus(protocol.utalization.times(newValueWeigth));
+        .plus(protocol.utilization.times(newValueWeigth));
 
     protocolData.txCount = protocolData.txCount.plus(BigInt.fromU32(1));
 

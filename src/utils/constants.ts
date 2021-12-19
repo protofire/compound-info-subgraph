@@ -26,6 +26,7 @@ export const PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER = BigInt.fromU32(7715908);
 export const GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER = BigInt.fromU32(
     10678764
 );
+export const COMP_SPEED_SPLIT_BLOCK_NUMBER = BigInt.fromU32(13322798);
 
 export const SEC_PER_BLOCK = BigDecimal.fromString("13.5");
 export const DAYS_PER_YEAR = BigInt.fromU32(365);

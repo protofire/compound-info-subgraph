@@ -23,7 +23,7 @@ export function handleMarketListed(event: MarketListedEvent): void {
     CTokenTemplate.create(event.params.cToken);
 
     // Create the protocol if it doesn't exist, this is just here for easier testing.
-    // TODO: remove later
+    // It will already exist
     let protocol = Protocol.load(PROTOCOL_ID);
     if (protocol == null) {
         let oracleAddress = PRICE_ORACLE_1_ADDRESS;

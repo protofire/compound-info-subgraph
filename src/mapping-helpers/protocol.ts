@@ -24,7 +24,7 @@ export function createProtocol(
     protocol.totalSupplyUsd = ZERO_BD;
     protocol.totalBorrowUsd = ZERO_BD;
     protocol.totalReservesUsd = ZERO_BD;
-    protocol.utalization = ZERO_BD;
+    protocol.utilization = ZERO_BD;
 
     return protocol;
 }
@@ -58,21 +58,11 @@ export function updateProtocolSummaryData(blockNumber: BigInt): void {
         const market = Market.load(marketId);
 
         if (market != null) {
-            // TODO: remove null checks and casting before I rerun (will make these required)
-            if (market.totalSupplyUsd !== null) {
-                const val = changetype<BigDecimal>(market.totalSupplyUsd);
-                totalSupplyUsd = totalSupplyUsd.plus(val);
-            }
+            totalSupplyUsd = totalSupplyUsd.plus(market.totalSupplyUsd);
 
-            if (market.totalBorrowUsd !== null) {
-                const val = changetype<BigDecimal>(market.totalBorrowUsd);
-                totalBorrowUsd = totalBorrowUsd.plus(val);
-            }
+            totalBorrowUsd = totalBorrowUsd.plus(market.totalBorrowUsd);
 
-            if (market.totalReservesUsd !== null) {
-                const val = changetype<BigDecimal>(market.totalReservesUsd);
-                totalReservesUsd = totalReservesUsd.plus(val);
-            }
+            totalReservesUsd = totalReservesUsd.plus(market.totalReservesUsd);
         } else {
             // Won't happen
             log.warning(
@@ -82,14 +72,14 @@ export function updateProtocolSummaryData(blockNumber: BigInt): void {
         }
     }
 
-    let utalization = totalSupplyUsd.equals(ZERO_BD)
+    let utilization = totalSupplyUsd.equals(ZERO_BD)
         ? ZERO_BD
         : totalBorrowUsd.div(totalSupplyUsd);
 
     protocol.totalSupplyUsd = totalSupplyUsd;
     protocol.totalBorrowUsd = totalBorrowUsd;
     protocol.totalReservesUsd = totalReservesUsd;
-    protocol.utalization = utalization;
+    protocol.utilization = utilization;
 
     protocol.save();
 }
