@@ -10,14 +10,9 @@ import {
     ETH_ADDRESS,
     CETH_ADDRESS,
     SAI_ADDRESS,
-    CUSDC_ADDRESS,
     COMP_ADDRESS,
     CCOMP_ADDRESS,
-    PROTOCOL_ID,
-    ZERO_BI,
     ZERO_BD,
-    ONE_BD,
-    SEC_PER_BLOCK,
     MKR_ADDRESS,
     COMP_SPEED_SPLIT_BLOCK_NUMBER,
 } from "../utils/constants";
@@ -91,11 +86,16 @@ export function createMarket(
     market.totalSupplyApy = ZERO_BD;
     market.totalBorrowApy = ZERO_BD;
     market.totalSupply = ZERO_BD;
+    market.totalSupplyUsd = ZERO_BD;
     market.totalBorrow = ZERO_BD;
+    market.totalBorrowUsd = ZERO_BD;
     market.totalReserves = ZERO_BD;
+    market.totalReservesUsd = ZERO_BD;
     market.availableLiquidity = ZERO_BD;
     market.availableLiquidityUsd = ZERO_BD;
     market.utilization = ZERO_BD;
+    market.compSpeedSupply = ZERO_BD;
+    market.compSpeedBorrow = ZERO_BD;
     market.usdcPerUnderlying = ZERO_BD;
     market.usdcPerEth = ZERO_BD;
     market.usdcPerComp = ZERO_BD;
@@ -119,7 +119,7 @@ export function updateMarket(
         return;
     }
 
-    log.info(`UPDATING MARKET: ${market.underlyingSymbol}`, []);
+    // log.info(`UPDATING MARKET: ${market.underlyingSymbol}`, []);
 
     // Only update if it hasn't been updated on this block yet
     if (market.latestBlockNumber != blockNumber) {
