@@ -4,6 +4,7 @@ import {
     Borrow as BorrowEvent,
     RepayBorrow as RepayBorrowEvent,
     LiquidateBorrow as LiquidateBorrowEvent,
+    AccrueInterest as AccrueInterestEventOld,
     AccrueInterest as AccrueInterestEvent,
     NewReserveFactor as NewReserveFactorEvent,
 } from "../../generated/templates/cToken/cToken";
@@ -19,6 +20,23 @@ import {
 
 export function handleMint(event: MintEvent): void {}
 
+/**
+ * This interface for accrue interest was used for ETH, USDC, WBTC, ZRX and BATT
+ */
+export function handleAccrueInterestOld(event: AccrueInterestEventOld): void {
+    updateMarket(event.address, event.block.number);
+    updateProtocolSummaryData(event.block.number);
+
+    // Update historical data after updateMarket and updateProtocolSummaryData is called
+    updateMarketHourData(event);
+    updateMarketDayData(event);
+    updateMarketWeekData(event);
+    updateProtocolWeekData(event);
+}
+
+/**
+ * After ETH, USDC, WBTC, ZRX and BATT, the accrue interest function changed
+ */
 export function handleAccrueInterest(event: AccrueInterestEvent): void {
     updateMarket(event.address, event.block.number);
     updateProtocolSummaryData(event.block.number);
