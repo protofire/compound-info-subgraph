@@ -75,12 +75,12 @@ templates:
                 handler: handleRepayBorrow
               - event: LiquidateBorrow(address,address,uint256,address,uint256)
                 handler: handleLiquidateBorrow
+              - event: Transfer(indexed address,indexed address,uint256)
+                handler: handleTransfer
               - event: AccrueInterest(uint256,uint256,uint256)
                 handler: handleAccrueInterestOld
               - event: AccrueInterest(uint256,uint256,uint256,uint256)
                 handler: handleAccrueInterest
-              - event: NewReserveFactor(uint256,uint256)
-                handler: handleNewReserveFactor
 graft:
-    base: QmRg4HrbknWReDamY2YtejuWmh2HRo5wmgW7xZfGou29Dv
-    block: 9303982
+    base: QmZ5rehi2L26QGZi5t5y4MLi8XoF7nmv8cSWufamzm584F
+    block: 9012625

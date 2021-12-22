@@ -1,5 +1,5 @@
 type Protocol @entity {
-    # only one of these
+    # only one of these (id=1)
     id: ID!
     # address of price oracle the comptroller uses
     priceOracle: Bytes!
@@ -44,6 +44,12 @@ type Market @entity {
     underlyingDecimals: BigInt!
     # comptroller address
     comptrollerAddress: Bytes!
+    # total number of unique suppliers to the market
+    numberOfSuppliers: BigInt!
+    # total number of unique borrowers to the market
+    numberOfBorrowers: BigInt!
+    # list of all UserMarket positions that belong to this market
+    userMarket: [UserMarket!]! @derivedFrom(field: market)
     # collator factor in decimal form
     collateralFactor: BigDecimal!
     # reserve factor in decimal form
@@ -238,4 +244,91 @@ type ProtocolWeekData @entity {
     utilization: BigDecimal!
     # number of transactions that went into deriving this data entry
     txCount: BigInt!
+}
+
+type User @entity {
+    # users wallet address
+    id: ID!
+    # most recent block number where the user was updated
+    lastBlockNumber: BigInt!
+    # list of all UserMarket positions that belong to this user 
+    userMarkets: [UserMarket!]! @derivedFrom(field: user)
+    # aggregate total of all supplied tokens by the user in all markets in USD
+    totalSupplyUsd: BigDecimal!
+    # aggregate total of all borrowed tokens by the user in all markets in USD
+    totalBorrowUsd: BigDecimal!
+}
+
+# Pairing for a single user to a single market, this repesents a users position in a market
+type UserMarket @entity {
+    # concatenation of market cToken address and user address
+    id: ID!
+    # market in pairing
+    market: Market!
+    # user in pairing
+    user: User!
+    # most recent block number where the AccountMarket was updated
+    latestBlockNumber: BigInt!
+    # if the market is entered by the user 
+    enteredMarket: Boolean!
+    # total amount of underlying supplied by the user to the market
+    totalSupply: BigDecimal!
+    # total amount of underlying borrowed by the user from the market
+    totalBorrow: BigDecimal!
+    # number of cTokens of this market the user owns
+    cTokenBalance: BigInt!
+    # transactions made by the user associated with this market 
+    transactions: [Transaction!]! @derivedFrom(field: userMarket)
+    # list of all liquidations the user has recieved in this market (i.e user had their borrow repayed in the markets underlying asset)
+    receivedLiquidations: [Liquidation!]! @derivedFrom(field: borrowerMarket)
+    # list of all liquidations the user had performed where they seized cTokens of this market (i.e user repayed another users borrow)
+    performedLiquidations: [Liquidation!]! @derivedFrom(field: liquidatorMarket)
+}
+
+enum TransactionType {
+    MINT
+    REDEEM
+    BORROW
+    REPAY
+    TRANSFER
+}
+
+# mint: underlying <-> ctoken
+# redeem: cToken <-> underlying
+# borrow: underlying
+# repay: underlying
+# transfer: cToken
+type Transaction @entity {
+    # transaction hash 
+    id: ID!
+    # block number the transation occured
+    blockNumber: BigInt! 
+    # unix timestamp in seconds the transaction was made 
+    date: BigInt!
+    # the type of the transaction
+    type: TransactionType!
+    # UserMarket the transaction belongs to
+    userMarket: UserMarket!
+    # underlying amount for the part of the transaction in the underlying token, this will be zero for TRANSFER
+    underlyingAmount: BigDecimal!
+    # cToken amount for the part of the transaction in cTokens, this will be zero for BORROW and REPAY 
+    cTokenAmount: BigDecimal!
+}
+
+# liquidation: underlying token from borrowerMarket's market <-> cTokens of liquidatorMarket's market
+type Liquidation @entity {
+    # transaction hash concat with ?? (TODO)
+    id: ID!
+    # block number of the liquidation
+    blockNumber: BigInt!
+    # unix timestamp in seconds the transaction was made 
+    date: BigInt!
+    # user being liquidated, and the market they are being liquidated in
+    borrowerMarket: UserMarket!
+    # user doing the liquidation, and the market they are seizing cTokens in
+    liquidatorMarket: UserMarket!
+    # amount of the underlying tokens of borrowerMarket's market which are being repayed by the liquidator
+    repayAmount: BigDecimal!
+    # amount of the cTokens of liquidatorMarket's market which are being seized by the liquidator 
+    seizeAmount: BigDecimal!
 }
