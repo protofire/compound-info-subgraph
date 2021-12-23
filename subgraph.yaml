@@ -35,6 +35,10 @@ dataSources:
                 handler: handleMarketListed
               - event: NewPriceOracle(address,address)
                 handler: handleNewPriceOracle
+              - event: MarketEntered(address,address)
+                handler: handleMarketEntered
+              - event: MarketExited(address,address)
+                handler: handleMarketExited
 templates:
     - name: CToken
       kind: ethereum/contract
@@ -65,6 +69,8 @@ templates:
               - name: PriceOracle2
                 file: ./abis/price-oracle-2.json
           eventHandlers:
+              - event: Approval(indexed address,indexed address,uint256)                
+                handler: handleApproval
               - event: Mint(address,uint256,uint256)
                 handler: handleMint
               - event: Redeem(address,uint256,uint256)
@@ -81,6 +87,6 @@ templates:
                 handler: handleAccrueInterestOld
               - event: AccrueInterest(uint256,uint256,uint256,uint256)
                 handler: handleAccrueInterest
-graft:
-    base: QmZ5rehi2L26QGZi5t5y4MLi8XoF7nmv8cSWufamzm584F
-    block: 9012625
+# graft:
+#     base: QmZ5rehi2L26QGZi5t5y4MLi8XoF7nmv8cSWufamzm584F
+#     block: 9012625

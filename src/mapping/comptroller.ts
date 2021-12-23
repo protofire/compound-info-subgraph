@@ -3,6 +3,8 @@ import { Address } from "@graphprotocol/graph-ts";
 import {
     MarketListed as MarketListedEvent,
     NewPriceOracle as NewPriceOracleEvent,
+    MarketEntered as MarketEnteredEvent,
+    MarketExited as MarketExitedEvent,
 } from "../../generated/comptroller/comptroller";
 import { Protocol } from "../../generated/schema";
 import { CToken as CTokenTemplate } from "../../generated/templates";
@@ -60,4 +62,18 @@ export function handleNewPriceOracle(event: NewPriceOracleEvent): void {
     protocol.priceOracle = event.params.newPriceOracle;
     protocol.lastNewOracleBlockNumber = blockNumber;
     protocol.save();
+}
+
+/**
+ * Emitted when a user decides to use this market as collatoral
+ */
+export function handleMarketEntered(event: MarketEnteredEvent): void {
+    // TODO: update UserMarket 
+}
+
+/**
+ * Emitted when a user decides to stop using this market as collatoral
+ */
+export function handleMarketExited(event: MarketExitedEvent): void {
+    // TODO: update UserMarket
 }

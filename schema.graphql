@@ -49,7 +49,7 @@ type Market @entity {
     # total number of unique borrowers to the market
     numberOfBorrowers: BigInt!
     # list of all UserMarket positions that belong to this market
-    userMarket: [UserMarket!]! @derivedFrom(field: market)
+    userMarket: [UserMarket!]! @derivedFrom(field: "market")
     # collator factor in decimal form
     collateralFactor: BigDecimal!
     # reserve factor in decimal form
@@ -249,26 +249,32 @@ type ProtocolWeekData @entity {
 type User @entity {
     # users wallet address
     id: ID!
+    # block number the user was created
+    creationBlockNumber: BigInt!
     # most recent block number where the user was updated
     lastBlockNumber: BigInt!
     # list of all UserMarket positions that belong to this user 
-    userMarkets: [UserMarket!]! @derivedFrom(field: user)
+    userMarkets: [UserMarket!]! @derivedFrom(field: "user")
     # aggregate total of all supplied tokens by the user in all markets in USD
-    totalSupplyUsd: BigDecimal!
+    #totalSupplyUsd: BigDecimal!
     # aggregate total of all borrowed tokens by the user in all markets in USD
-    totalBorrowUsd: BigDecimal!
+    #totalBorrowUsd: BigDecimal!
 }
 
 # Pairing for a single user to a single market, this repesents a users position in a market
 type UserMarket @entity {
     # concatenation of market cToken address and user address
     id: ID!
-    # market in pairing
-    market: Market!
     # user in pairing
     user: User!
+    # market in pairing
+    market: Market!
+    # block number the user market was created
+    creationBlockNumber: BigInt!
     # most recent block number where the AccountMarket was updated
     latestBlockNumber: BigInt!
+    # number of underlying tokens the markets cToken contract is approved to spend from the users wallet 
+    approvalAmount: BigDecimal!
     # if the market is entered by the user 
     enteredMarket: Boolean!
     # total amount of underlying supplied by the user to the market
@@ -276,57 +282,117 @@ type UserMarket @entity {
     # total amount of underlying borrowed by the user from the market
     totalBorrow: BigDecimal!
     # number of cTokens of this market the user owns
-    cTokenBalance: BigInt!
-    # transactions made by the user associated with this market 
-    transactions: [Transaction!]! @derivedFrom(field: userMarket)
+    cTokenBalance: BigDecimal!
+    # mint events from this market made by the user 
+    mints: [Mint!]! @derivedFrom(field: "userMarket")
+    # redeem events to this market made by the user 
+    redeems: [Redeem!]! @derivedFrom(field: "userMarket")
+    # borrow events from this market made by the user 
+    borrows: [Borrow!]! @derivedFrom(field: "userMarket")
+    # repay events to this market made by the user 
+    repayBorrows: [RepayBorrow!]! @derivedFrom(field: "userMarket")
+    # transfer events of the market cToken from the user to another user 
+    fromTransfers: [Transfer!]! @derivedFrom(field: "fromUserMarket")
+    # transfer events of the market cToken to the user from another user 
+    toTransfers: [Transfer!]! @derivedFrom(field: "toUserMarket")
     # list of all liquidations the user has recieved in this market (i.e user had their borrow repayed in the markets underlying asset)
-    receivedLiquidations: [Liquidation!]! @derivedFrom(field: borrowerMarket)
+    receivedLiquidations: [Liquidation!]! @derivedFrom(field: "borrowerUserLiquidationMarket")
+    # list of all seizes where the market cToken was seized from the user in a liquidation
+    seizeLiquidations: [Liquidation!]! @derivedFrom(field: "borrowerUserSeizeMarket")
     # list of all liquidations the user had performed where they seized cTokens of this market (i.e user repayed another users borrow)
-    performedLiquidations: [Liquidation!]! @derivedFrom(field: liquidatorMarket)
-}
-
-enum TransactionType {
-    MINT
-    REDEEM
-    BORROW
-    REPAY
-    TRANSFER
+    performedLiquidations: [Liquidation!]! @derivedFrom(field: "liquidatorUserMarket")
 }
 
 # mint: underlying <-> ctoken
-# redeem: cToken <-> underlying
-# borrow: underlying
-# repay: underlying
-# transfer: cToken
-type Transaction @entity {
+type Mint @entity {
     # transaction hash 
     id: ID!
     # block number the transation occured
     blockNumber: BigInt! 
     # unix timestamp in seconds the transaction was made 
     date: BigInt!
-    # the type of the transaction
-    type: TransactionType!
     # UserMarket the transaction belongs to
     userMarket: UserMarket!
-    # underlying amount for the part of the transaction in the underlying token, this will be zero for TRANSFER
+    # underlying amount for the part of the transaction in the underlying token
     underlyingAmount: BigDecimal!
-    # cToken amount for the part of the transaction in cTokens, this will be zero for BORROW and REPAY 
+    # cToken amount for the part of the transaction in cTokens
+    cTokenAmount: BigDecimal!
+}
+
+# redeem: cToken <-> underlying
+type Redeem @entity {
+    # transaction hash 
+    id: ID!
+    # block number the transation occured
+    blockNumber: BigInt! 
+    # unix timestamp in seconds the transaction was made 
+    date: BigInt!
+    # UserMarket the transaction belongs to
+    userMarket: UserMarket!
+    # underlying amount for the part of the transaction in the underlying token
+    underlyingAmount: BigDecimal!
+    # cToken amount for the part of the transaction in cTokens
+    cTokenAmount: BigDecimal!
+}
+
+# borrow: underlying
+type Borrow @entity {
+    # transaction hash 
+    id: ID!
+    # block number the transation occured
+    blockNumber: BigInt! 
+    # unix timestamp in seconds the transaction was made 
+    date: BigInt!
+    # UserMarket the transaction belongs to
+    userMarket: UserMarket!
+    # underlying amount for the part of the transaction in the underlying token
+    underlyingAmount: BigDecimal!
+}
+
+# repay: underlying
+type RepayBorrow @entity {
+    # transaction hash 
+    id: ID!
+    # block number the transation occured
+    blockNumber: BigInt! 
+    # unix timestamp in seconds the transaction was made 
+    date: BigInt!
+    # UserMarket the transaction belongs to
+    userMarket: UserMarket!
+    # underlying amount for the part of the transaction in the underlying token
+    underlyingAmount: BigDecimal!
+}
+
+# transfer: cToken
+type Transfer @entity {
+    # transaction hash 
+    id: ID!
+    # block number the transation occured
+    blockNumber: BigInt! 
+    # unix timestamp in seconds the transaction was made 
+    date: BigInt!
+    # UserMarket the transaction came from 
+    fromUserMarket: UserMarket!
+    # UserMarket the transaction is going to 
+    toUserMarket: UserMarket!
+    # cToken amount for the part of the transaction in cTokens
     cTokenAmount: BigDecimal!
 }
 
 # liquidation: underlying token from borrowerMarket's market <-> cTokens of liquidatorMarket's market
 type Liquidation @entity {
-    # transaction hash concat with ?? (TODO)
+    # transaction hash 
     id: ID!
     # block number of the liquidation
     blockNumber: BigInt!
-    # unix timestamp in seconds the transaction was made 
+    # unix timestamp in seconds the liqudation was made 
     date: BigInt!
-    # user being liquidated, and the market they are being liquidated in
-    borrowerMarket: UserMarket!
-    # user doing the liquidation, and the market they are seizing cTokens in
-    liquidatorMarket: UserMarket!
+    # user being liquidated and the market they are being liquidated in
+    borrowerUserLiquidationMarket: UserMarket!
+    # user being liquidated and the market they are having cTokens seized from
+    borrowerUserSeizeMarket: UserMarket!
+    # user doing the liquidation and the market they are seizing cTokens in
+    liquidatorUserMarket: UserMarket!
     # amount of the underlying tokens of borrowerMarket's market which are being repayed by the liquidator
     repayAmount: BigDecimal!
     # amount of the cTokens of liquidatorMarket's market which are being seized by the liquidator 
