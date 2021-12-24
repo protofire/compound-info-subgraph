@@ -12,8 +12,17 @@ import {
     Transfer as TransferEvent,
 } from "../../generated/templates/cToken/cToken";
 
-import { Market, User, UserMarket, Mint, Redeem, Borrow, RepayBorrow, Transfer, Liquidation} from "../../generated/schema";
-
+import {
+    Market,
+    User,
+    UserMarket,
+    Mint,
+    Redeem,
+    Borrow,
+    RepayBorrow,
+    Transfer,
+    Liquidation,
+} from "../../generated/schema";
 
 import { updateMarket } from "../mapping-helpers/market";
 import { createUser } from "../mapping-helpers/user";
@@ -26,8 +35,10 @@ import {
 } from "../mapping-helpers/historical-data";
 import { createUserMarket } from "../mapping-helpers/userMarket";
 import { tokenAmountToDecimal } from "../utils/utils";
-import { GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER } from "../utils/constants";
-
+import {
+    GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER,
+    PRICE_ORACLE_1_ADDRESS,
+} from "../utils/constants";
 
 /**
  * This interface for accrue interest was used for ETH, USDC, WBTC, ZRX and BATT
@@ -65,14 +76,16 @@ export function handleApproval(event: ApprovalEvent): void {
     let user = User.load(userAddress.toHexString());
     let market = Market.load(marketAddress.toHexString());
 
-    if(market == null) {
+    if (market == null) {
         // Won't happen
         log.warning("*** ERROR: market was null in handleApproval()", []);
         return;
     }
 
+    log.info("*** APPROVAL", []);
+
     // Create user if they don't exist already
-    if(user == null) {
+    if (user == null) {
         user = createUser(userAddress, blockNumber);
         user.save();
     }
@@ -82,51 +95,75 @@ export function handleApproval(event: ApprovalEvent): void {
     let userMarket = UserMarket.load(userMarketId);
 
     // Create marketUser if it doesn't exist
-    if(userMarket == null) {
-        userMarket = createUserMarket(userAddress, marketAddress, blockNumber)
+    if (userMarket == null) {
+        userMarket = createUserMarket(userAddress, marketAddress, blockNumber);
     }
 
-    userMarket.approvalAmount = tokenAmountToDecimal(event.params.amount, market.underlyingDecimals);
-    userMarket.latestBlockNumber = event.block.number;
+    userMarket.approvalAmount = tokenAmountToDecimal(
+        event.params.amount,
+        market.underlyingDecimals
+    );
+    userMarket.latestBlockNumber = blockNumber;
 
+    log.info("*** APPROVAL FINISHED", []);
+
+    user.save();
     userMarket.save();
 }
 
 /**
  * Emitted when a user supplies a token to a market
- * cTokens are minted and given to the supplier 
+ * cTokens are minted and given to the supplier
  * Also emits a transfer right after
  */
 export function handleMint(event: MintEvent): void {
     const userAddress = event.params.minter;
     const marketAddress = event.address;
+    const blockNumber = event.block.number;
 
-    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const userMarketId =
+        userAddress.toHexString() + marketAddress.toHexString();
 
     const market = Market.load(marketAddress.toHexString());
-    const userMarket = UserMarket.load(userMarketId);
+    let user = User.load(userAddress.toHexString());
+    let userMarket = UserMarket.load(userMarketId);
 
-    if(market == null || userMarket == null) {
-       // Won't happen
-       log.warning("*** ERROR: market or userMarket was null in handleMint()", []);
-       return; 
+    if (market == null) {
+        // Won't happen
+        log.warning("*** ERROR: market was null in handleMint()", []);
+        return;
+    }
+
+    if (user == null) {
+        user = createUser(userAddress, blockNumber);
+        user.save();
+    }
+
+    if (userMarket == null) {
+        userMarket = createUserMarket(userAddress, marketAddress, blockNumber);
     }
 
     // The user and userMarket will already exists
     // because the user would have needed to approve first and handleApproval creates these
 
     // Create mint event
-    const mint = new Mint(event.transaction.hash.toString());
-    mint.blockNumber = event.block.number;
+    const mint = new Mint(event.transaction.hash.toHexString());
+    mint.blockNumber = blockNumber;
     mint.date = event.block.timestamp;
     mint.userMarket = userMarket.id;
-    mint.underlyingAmount = tokenAmountToDecimal(event.params.mintAmount, market.underlyingDecimals); 
-    mint.cTokenAmount = tokenAmountToDecimal(event.params.mintTokens, market.cTokenDecimals);
+    mint.underlyingAmount = tokenAmountToDecimal(
+        event.params.mintAmount,
+        market.underlyingDecimals
+    );
+    mint.cTokenAmount = tokenAmountToDecimal(
+        event.params.mintTokens,
+        market.cTokenDecimals
+    );
 
     // Update user market summary stats
     userMarket.cTokenBalance = userMarket.cTokenBalance.plus(mint.cTokenAmount);
     userMarket.totalSupply = userMarket.totalSupply.plus(mint.underlyingAmount);
-    userMarket.latestBlockNumber = event.block.number;
+    userMarket.latestBlockNumber = blockNumber;
 
     userMarket.save();
     mint.save();
@@ -139,104 +176,152 @@ export function handleMint(event: MintEvent): void {
 export function handleRedeem(event: RedeemEvent): void {
     const userAddress = event.params.redeemer;
     const marketAddress = event.address;
+    const blockNumber = event.block.number;
 
-    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const userMarketId =
+        userAddress.toHexString() + marketAddress.toHexString();
 
     const market = Market.load(marketAddress.toHexString());
-    const userMarket = UserMarket.load(userMarketId);
+    let user = User.load(userAddress.toHexString());
+    let userMarket = UserMarket.load(userMarketId);
 
-    if(market == null || userMarket == null) {
-       // Won't happen
-       log.warning("*** ERROR: market or userMarket was null in handleRedeem()", []);
-       return; 
+    if (market == null) {
+        // Won't happen
+        log.warning("*** ERROR: market was null in handleRedeem()", []);
+        return;
     }
 
-    // The user and userMarket will already exist because the user got cTokens in one of 2 ways
-    //     1. calling mint function, which already gaurentees they exist through approval
-    //     2. getting transfered it, and handleTransfer creates the user and userMarket if it doesn't exist
+    if (user == null) {
+        user = createUser(userAddress, blockNumber);
+        user.save();
+    }
+
+    if (userMarket == null) {
+        userMarket = createUserMarket(userAddress, marketAddress, blockNumber);
+    }
 
     // Create redeem event
-    const redeem = new Redeem(event.transaction.hash.toString());
-    redeem.blockNumber = event.block.number;
+    const redeem = new Redeem(event.transaction.hash.toHexString());
+    redeem.blockNumber = blockNumber;
     redeem.date = event.block.timestamp;
     redeem.userMarket = userMarketId;
-    redeem.underlyingAmount = tokenAmountToDecimal(event.params.redeemAmount, market.underlyingDecimals); 
-    redeem.cTokenAmount = tokenAmountToDecimal(event.params.redeemTokens, market.cTokenDecimals);
+    redeem.underlyingAmount = tokenAmountToDecimal(
+        event.params.redeemAmount,
+        market.underlyingDecimals
+    );
+    redeem.cTokenAmount = tokenAmountToDecimal(
+        event.params.redeemTokens,
+        market.cTokenDecimals
+    );
 
     // Update userMarket summary states
-    userMarket.totalSupply = userMarket.totalSupply.minus(redeem.underlyingAmount);
-    userMarket.cTokenBalance = userMarket.cTokenBalance.minus(redeem.cTokenAmount);
-    userMarket.latestBlockNumber = event.block.number;
+    userMarket.totalSupply = userMarket.totalSupply.minus(
+        redeem.underlyingAmount
+    );
+    userMarket.cTokenBalance = userMarket.cTokenBalance.minus(
+        redeem.cTokenAmount
+    );
+    userMarket.latestBlockNumber = blockNumber;
 
     userMarket.save();
     redeem.save();
 }
 
 /**
- * Emitted when a user borrows a token 
+ * Emitted when a user borrows a token
  */
 export function handleBorrow(event: BorrowEvent): void {
     const userAddress = event.params.borrower;
     const marketAddress = event.address;
+    const blockNumber = event.block.number;
 
-    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const userMarketId =
+        userAddress.toHexString() + marketAddress.toHexString();
 
     const market = Market.load(marketAddress.toHexString());
-    const userMarket = UserMarket.load(userMarketId);
+    let user = User.load(userAddress.toHexString());
+    let userMarket = UserMarket.load(userMarketId);
 
-    if(market == null || userMarket == null) {
-       // Won't happen
-       log.warning("*** ERROR: market or userMarket was null in handleBorrow()", []);
-       return; 
+    if (market == null) {
+        // Won't happen
+        log.warning("*** ERROR: market was null in handleBorrow()", []);
+        return;
     }
 
-    // user would already exist becuase they would have needed to mint first
+    if (user == null) {
+        user = createUser(userAddress, blockNumber);
+        user.save();
+    }
+
+    if (userMarket == null) {
+        userMarket = createUserMarket(userAddress, marketAddress, blockNumber);
+    }
 
     // Create borrow event
-    const borrow = new Borrow(event.transaction.hash.toString());
-    borrow.blockNumber = event.block.number;
+    const borrow = new Borrow(event.transaction.hash.toHexString());
+    borrow.blockNumber = blockNumber;
     borrow.date = event.block.timestamp;
     borrow.userMarket = userMarketId;
-    borrow.underlyingAmount = tokenAmountToDecimal(event.params.borrowAmount, market.underlyingDecimals); 
+    borrow.underlyingAmount = tokenAmountToDecimal(
+        event.params.borrowAmount,
+        market.underlyingDecimals
+    );
 
     // Update userMarket summary states
-    userMarket.totalBorrow = userMarket.totalBorrow.plus(borrow.underlyingAmount);
-    userMarket.latestBlockNumber = event.block.number;
+    userMarket.totalBorrow = userMarket.totalBorrow.plus(
+        borrow.underlyingAmount
+    );
+    userMarket.latestBlockNumber = blockNumber;
 
     userMarket.save();
     borrow.save();
 }
 
 /**
- * Emmiteed when a user repays their borrow 
+ * Emmiteed when a user repays their borrow
  */
 export function handleRepayBorrow(event: RepayBorrowEvent): void {
     const userAddress = event.params.borrower;
     const marketAddress = event.address;
+    const blockNumber = event.block.number;
 
-    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const userMarketId =
+        userAddress.toHexString() + marketAddress.toHexString();
 
     const market = Market.load(marketAddress.toHexString());
-    const userMarket = UserMarket.load(userMarketId);
+    let user = User.load(userAddress.toHexString());
+    let userMarket = UserMarket.load(userMarketId);
 
-    if(market == null || userMarket == null) {
-       // Won't happen
-       log.warning("*** ERROR: market or userMarket was null in handleBorrow()", []);
-       return; 
+    if (market == null) {
+        // Won't happen
+        log.warning("*** ERROR: market was null in handleBorrow()", []);
+        return;
     }
 
-    // user would already exist becuase they would have needed to borrow first
+    if (user == null) {
+        user = createUser(userAddress, blockNumber);
+        user.save();
+    }
+
+    if (userMarket == null) {
+        userMarket = createUserMarket(userAddress, marketAddress, blockNumber);
+    }
 
     // Create borrow event
-    const repayBorrow = new RepayBorrow(event.transaction.hash.toString());
+    const repayBorrow = new RepayBorrow(event.transaction.hash.toHexString());
     repayBorrow.blockNumber = event.block.number;
     repayBorrow.date = event.block.timestamp;
     repayBorrow.userMarket = userMarketId;
-    repayBorrow.underlyingAmount = tokenAmountToDecimal(event.params.repayAmount, market.underlyingDecimals); 
+    repayBorrow.underlyingAmount = tokenAmountToDecimal(
+        event.params.repayAmount,
+        market.underlyingDecimals
+    );
 
     // Update userMarket summary states
-    userMarket.totalBorrow = userMarket.totalBorrow.minus(repayBorrow.underlyingAmount);
-    userMarket.latestBlockNumber = event.block.number;
+    userMarket.totalBorrow = userMarket.totalBorrow.minus(
+        repayBorrow.underlyingAmount
+    );
+    userMarket.latestBlockNumber = blockNumber;
 
     userMarket.save();
     repayBorrow.save();
@@ -256,52 +341,106 @@ export function handleLiquidateBorrow(event: LiquidateBorrowEvent): void {
     const seizeMarketAddress = event.params.cTokenCollateral;
     const blockNumber = event.block.number;
 
-    const borrowerUserLiquidationMarketId = borrowerAddress.toHexString() + liquidationMarketAddress.toHexString();
-    const borrowerUserSeizeMarketId = borrowerAddress.toHexString() + seizeMarketAddress.toHexString();
-    const liquidatorUserMarketId = liquidatorAddress.toHexString() + seizeMarketAddress.toHexString();
-    
-    const liquidationMarket = Market.load(liquidationMarketAddress.toHexString());
+    const borrowerUserLiquidationMarketId =
+        borrowerAddress.toHexString() + liquidationMarketAddress.toHexString();
+    const borrowerUserSeizeMarketId =
+        borrowerAddress.toHexString() + seizeMarketAddress.toHexString();
+
+    const liquidatorUserMarketId =
+        liquidatorAddress.toHexString() + seizeMarketAddress.toHexString();
+
+    const liquidationMarket = Market.load(
+        liquidationMarketAddress.toHexString()
+    );
     const seizeMarket = Market.load(seizeMarketAddress.toHexString());
-    const borrowerUserLiquidationMarket = UserMarket.load(borrowerUserLiquidationMarketId);
-    const borrowerUserSeizeMarket = UserMarket.load(borrowerUserSeizeMarketId);
 
-    if(liquidationMarket == null || seizeMarket == null || borrowerUserLiquidationMarket == null || borrowerUserSeizeMarket == null) {
-       // Won't happen
-       log.warning("*** ERROR: liquidationMarket or seizeMarket or borrowerUserLiquidationMarket or borrowerUserSeizeMarket was null in handleLiquidateBorrow()", []);
-       return; 
-    }
+    let borrowerUser = User.load(borrowerAddress.toHexString());
+    let borrowerUserLiquidationMarket = UserMarket.load(
+        borrowerUserLiquidationMarketId
+    );
+    let borrowerUserSeizeMarket = UserMarket.load(borrowerUserSeizeMarketId);
 
+    let liquidatorUser = User.load(liquidatorAddress.toHexString());
     let liquidatorUserMarket = UserMarket.load(liquidatorUserMarketId);
 
-    // It is possible for the liquidator user, and userMarket to not exist yet. Create them if so
+    if (
+        liquidationMarket == null ||
+        seizeMarket == null ||
+        borrowerUserLiquidationMarket == null ||
+        borrowerUserSeizeMarket == null
+    ) {
+        // Won't happen
+        log.warning(
+            "*** ERROR: liquidationMarket or seizeMarket or borrowerUserLiquidationMarket or borrowerUserSeizeMarket was null in handleLiquidateBorrow()",
+            []
+        );
+        return;
+    }
+
+    if (borrowerUser == null) {
+        borrowerUser = createUser(borrowerAddress, blockNumber);
+        borrowerUser.save();
+    }
+
+    if (liquidatorUser == null) {
+        // Create liquidator user if it doesn't exist
+        liquidatorUser = createUser(liquidatorAddress, blockNumber);
+        liquidatorUser.save();
+    }
+
+    if (borrowerUserLiquidationMarket == null) {
+        borrowerUserLiquidationMarket = createUserMarket(
+            borrowerAddress,
+            liquidationMarketAddress,
+            blockNumber
+        );
+    }
+
+    if (borrowerUserSeizeMarket == null) {
+        borrowerUserSeizeMarket = createUserMarket(
+            borrowerAddress,
+            seizeMarketAddress,
+            blockNumber
+        );
+    }
+
     if (liquidatorUserMarket == null) {
-        let liquidatorUser = User.load(liquidatorAddress.toHexString());
-
-        if(liquidatorUser == null) {
-            // Create liquidator user if it doesn't exist
-            liquidatorUser = createUser(liquidatorAddress, blockNumber);
-            liquidatorUser.save();
-        }
-
-        liquidatorUserMarket = createUserMarket(liquidatorAddress, seizeMarketAddress, blockNumber);
+        liquidatorUserMarket = createUserMarket(
+            liquidatorAddress,
+            seizeMarketAddress,
+            blockNumber
+        );
     }
 
     // borrower user would already exist becuase they would have needed to borrow first
 
     // Create liquidation event
-    const liquidation = new Liquidation(event.transaction.hash.toString());
+    const liquidation = new Liquidation(event.transaction.hash.toHexString());
     liquidation.blockNumber = event.block.number;
     liquidation.date = event.block.timestamp;
-    liquidation.borrowerUserLiquidationMarket = borrowerUserLiquidationMarket.id;
+    liquidation.borrowerUserLiquidationMarket =
+        borrowerUserLiquidationMarket.id;
     liquidation.borrowerUserSeizeMarket = borrowerUserSeizeMarket.id;
     liquidation.liquidatorUserMarket = liquidatorUserMarket.id;
-    liquidation.repayAmount = tokenAmountToDecimal(event.params.repayAmount, liquidationMarket.underlyingDecimals);
-    liquidation.seizeAmount = tokenAmountToDecimal(event.params.seizeTokens, seizeMarket.cTokenDecimals) ;
+    liquidation.repayAmount = tokenAmountToDecimal(
+        event.params.repayAmount,
+        liquidationMarket.underlyingDecimals
+    );
+    liquidation.seizeAmount = tokenAmountToDecimal(
+        event.params.seizeTokens,
+        seizeMarket.cTokenDecimals
+    );
 
     // Update userMarket summary states
-    borrowerUserLiquidationMarket.totalBorrow = borrowerUserLiquidationMarket.totalBorrow.minus(liquidation.repayAmount);
-    borrowerUserSeizeMarket.cTokenBalance = borrowerUserSeizeMarket.cTokenBalance.minus(liquidation.seizeAmount);
-    liquidatorUserMarket.cTokenBalance = liquidatorUserMarket.cTokenBalance.plus(liquidation.seizeAmount)
+    borrowerUserLiquidationMarket.totalBorrow = borrowerUserLiquidationMarket.totalBorrow.minus(
+        liquidation.repayAmount
+    );
+    borrowerUserSeizeMarket.cTokenBalance = borrowerUserSeizeMarket.cTokenBalance.minus(
+        liquidation.seizeAmount
+    );
+    liquidatorUserMarket.cTokenBalance = liquidatorUserMarket.cTokenBalance.plus(
+        liquidation.seizeAmount
+    );
 
     borrowerUserLiquidationMarket.save();
     borrowerUserSeizeMarket.save();
@@ -311,8 +450,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrowEvent): void {
 
 /**
  * Transfer event is called anyime a cToken is transfered: mint, redeem, liquidation, and a transfer from wallet to wallet
- * We care only about wallet to wallet transfer, the rest are captured in their respective handler 
+ * We care only about wallet to wallet transfer, the rest are captured in their respective handler
  */
 export function handleTransfer(event: TransferEvent): void {
-    // TODO: create user and userMarket for the transfer to wallet if it doesn't exist. This is the only other way besides approve 
+    // TODO: create user and userMarket for the transfer to wallet if it doesn't exist. This is the only other way besides approve
 }
