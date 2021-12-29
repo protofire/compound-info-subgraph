@@ -17,6 +17,8 @@ dataSources:
           entities:
               - Protocol
               - Market
+              - User
+              - UserMarket
           abis:
               - name: CToken
                 file: ./abis/cToken.json
@@ -53,6 +55,14 @@ templates:
           entities:
               - Protocol
               - Market
+              - User
+              - UserMarket
+              - Mint
+              - Redeem
+              - Borrow
+              - RepayBorrow
+              - Transfer
+              - Liquidation
           abis:
               - name: CToken
                 file: ./abis/cToken.json
@@ -69,20 +79,18 @@ templates:
               - name: PriceOracle2
                 file: ./abis/price-oracle-2.json
           eventHandlers:
-              - event: Approval(indexed address,indexed address,uint256)                
-                handler: handleApproval
               - event: Mint(address,uint256,uint256)
                 handler: handleMint
               - event: Redeem(address,uint256,uint256)
                 handler: handleRedeem
-              - event: Borrow(address,uint256,uint256,uint256)
-                handler: handleBorrow
-              - event: RepayBorrow(address,address,uint256,uint256,uint256)
-                handler: handleRepayBorrow
-              - event: LiquidateBorrow(address,address,uint256,address,uint256)
-                handler: handleLiquidateBorrow
-              - event: Transfer(indexed address,indexed address,uint256)
-                handler: handleTransfer
+              # - event: Borrow(address,uint256,uint256,uint256)
+              #   handler: handleBorrow
+              # - event: RepayBorrow(address,address,uint256,uint256,uint256)
+              #   handler: handleRepayBorrow
+              # - event: LiquidateBorrow(address,address,uint256,address,uint256)
+              #   handler: handleLiquidateBorrow
+              # - event: Transfer(indexed address,indexed address,uint256)
+              #   handler: handleTransfer
               - event: AccrueInterest(uint256,uint256,uint256)
                 handler: handleAccrueInterestOld
               - event: AccrueInterest(uint256,uint256,uint256,uint256)

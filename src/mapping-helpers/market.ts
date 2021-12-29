@@ -78,7 +78,7 @@ export function createMarket(
     market.reserveFactor = ZERO_BD;
     market.borrowCap = ZERO_BD;
     market.cash = ZERO_BD;
-    market.cTokenPerUnderlying = ZERO_BD;
+    market.underlyingPerCToken = ZERO_BD;
     market.supplyRatePerBlock = ZERO_BD;
     market.supplyRatePerBlock = ZERO_BD;
     market.supplyApy = ZERO_BD;
@@ -100,6 +100,7 @@ export function createMarket(
     market.usdcPerEth = ZERO_BD;
     market.usdcPerComp = ZERO_BD;
 
+    market.save();
     return market;
 }
 
@@ -148,7 +149,7 @@ export function updateMarket(
         );
 
         // mantisa for this is 18 + underlying decimals - ctoken decimals, i.e the value is scaled by 10^18 in contract
-        market.cTokenPerUnderlying = tokenAmountToDecimal(
+        market.underlyingPerCToken = tokenAmountToDecimal(
             contract.exchangeRateStored(),
             BigInt.fromU32(18)
                 .plus(market.underlyingDecimals)
@@ -158,7 +159,7 @@ export function updateMarket(
         market.totalSupply = tokenAmountToDecimal(
             contract.totalSupply(),
             market.cTokenDecimals
-        ).times(market.cTokenPerUnderlying);
+        ).times(market.underlyingPerCToken);
 
         market.totalSupplyUsd = market.totalSupply.times(
             market.usdcPerUnderlying
