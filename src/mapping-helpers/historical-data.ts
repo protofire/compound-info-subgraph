@@ -9,15 +9,7 @@ import {
     ProtocolWeekData,
 } from "../../generated/schema";
 
-import {
-    SEC_PER_HOUR,
-    SEC_PER_DAY,
-    SEC_PER_WEEK,
-    ZERO_BD,
-    ZERO_BI,
-    ONE_BD,
-    PROTOCOL_ID,
-} from "../utils/constants";
+import { SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, ZERO_BD, ZERO_BI, ONE_BD, PROTOCOL_ID } from "../utils/constants";
 
 export function updateMarketHourData(event: ethereum.Event): void {
     const marketAddress = event.address;
@@ -63,13 +55,9 @@ export function updateMarketHourData(event: ethereum.Event): void {
     const newValueWeigth = BigDecimal.fromString("1").div(txCount.plus(ONE_BD));
 
     // Compute averages: newValue = (oldValue*txCount + newValue) / (txCount + 1)
-    marketData.supplyApy = marketData.supplyApy
-        .times(oldValueWeight)
-        .plus(market.supplyApy.times(newValueWeigth));
+    marketData.supplyApy = marketData.supplyApy.times(oldValueWeight).plus(market.supplyApy.times(newValueWeigth));
 
-    marketData.borrowApy = marketData.borrowApy
-        .times(oldValueWeight)
-        .plus(market.borrowApy.times(newValueWeigth));
+    marketData.borrowApy = marketData.borrowApy.times(oldValueWeight).plus(market.borrowApy.times(newValueWeigth));
 
     marketData.totalSupplyApy = marketData.totalSupplyApy
         .times(oldValueWeight)
@@ -111,9 +99,7 @@ export function updateMarketHourData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.usdcPerUnderlying.times(newValueWeigth));
 
-    marketData.usdcPerEth = marketData.usdcPerEth
-        .times(oldValueWeight)
-        .plus(market.usdcPerEth.times(newValueWeigth));
+    marketData.usdcPerEth = marketData.usdcPerEth.times(oldValueWeight).plus(market.usdcPerEth.times(newValueWeigth));
 
     marketData.usdcPerComp = marketData.usdcPerComp
         .times(oldValueWeight)
@@ -173,13 +159,9 @@ export function updateMarketDayData(event: ethereum.Event): void {
     const newValueWeigth = BigDecimal.fromString("1").div(txCount.plus(ONE_BD));
 
     // Compute averages: newValue = (oldValue*txCount + newValue) / (txCount + 1)
-    marketData.supplyApy = marketData.supplyApy
-        .times(oldValueWeight)
-        .plus(market.supplyApy.times(newValueWeigth));
+    marketData.supplyApy = marketData.supplyApy.times(oldValueWeight).plus(market.supplyApy.times(newValueWeigth));
 
-    marketData.borrowApy = marketData.borrowApy
-        .times(oldValueWeight)
-        .plus(market.borrowApy.times(newValueWeigth));
+    marketData.borrowApy = marketData.borrowApy.times(oldValueWeight).plus(market.borrowApy.times(newValueWeigth));
 
     marketData.totalSupplyApy = marketData.totalSupplyApy
         .times(oldValueWeight)
@@ -221,9 +203,7 @@ export function updateMarketDayData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.usdcPerUnderlying.times(newValueWeigth));
 
-    marketData.usdcPerEth = marketData.usdcPerEth
-        .times(oldValueWeight)
-        .plus(market.usdcPerEth.times(newValueWeigth));
+    marketData.usdcPerEth = marketData.usdcPerEth.times(oldValueWeight).plus(market.usdcPerEth.times(newValueWeigth));
 
     marketData.usdcPerComp = marketData.usdcPerComp
         .times(oldValueWeight)
@@ -278,13 +258,9 @@ export function updateMarketWeekData(event: ethereum.Event): void {
     const newValueWeigth = BigDecimal.fromString("1").div(txCount.plus(ONE_BD));
 
     // Compute averages: newValue = (oldValue*txCount + newValue) / (txCount + 1)
-    marketData.supplyApy = marketData.supplyApy
-        .times(oldValueWeight)
-        .plus(market.supplyApy.times(newValueWeigth));
+    marketData.supplyApy = marketData.supplyApy.times(oldValueWeight).plus(market.supplyApy.times(newValueWeigth));
 
-    marketData.borrowApy = marketData.borrowApy
-        .times(oldValueWeight)
-        .plus(market.borrowApy.times(newValueWeigth));
+    marketData.borrowApy = marketData.borrowApy.times(oldValueWeight).plus(market.borrowApy.times(newValueWeigth));
 
     marketData.totalSupplyApy = marketData.totalSupplyApy
         .times(oldValueWeight)
@@ -326,9 +302,7 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         .times(oldValueWeight)
         .plus(market.usdcPerUnderlying.times(newValueWeigth));
 
-    marketData.usdcPerEth = marketData.usdcPerEth
-        .times(oldValueWeight)
-        .plus(market.usdcPerEth.times(newValueWeigth));
+    marketData.usdcPerEth = marketData.usdcPerEth.times(oldValueWeight).plus(market.usdcPerEth.times(newValueWeigth));
 
     marketData.usdcPerComp = marketData.usdcPerComp
         .times(oldValueWeight)
@@ -343,10 +317,7 @@ export function updateProtocolWeekData(event: ethereum.Event): void {
     const protocol = Protocol.load(PROTOCOL_ID);
 
     if (protocol == null) {
-        log.warning(
-            "*** ERROR: protocol was null in updateProtocolWeekData()",
-            []
-        );
+        log.warning("*** ERROR: protocol was null in updateProtocolWeekData()", []);
         return;
     }
 

@@ -83,18 +83,18 @@ templates:
                 handler: handleMint
               - event: Redeem(address,uint256,uint256)
                 handler: handleRedeem
-              # - event: Borrow(address,uint256,uint256,uint256)
-              #   handler: handleBorrow
-              # - event: RepayBorrow(address,address,uint256,uint256,uint256)
-              #   handler: handleRepayBorrow
-              # - event: LiquidateBorrow(address,address,uint256,address,uint256)
-              #   handler: handleLiquidateBorrow
-              # - event: Transfer(indexed address,indexed address,uint256)
-              #   handler: handleTransfer
+              - event: Borrow(address,uint256,uint256,uint256)
+                handler: handleBorrow
+              - event: RepayBorrow(address,address,uint256,uint256,uint256)
+                handler: handleRepayBorrow
+              - event: LiquidateBorrow(address,address,uint256,address,uint256)
+                handler: handleLiquidateBorrow
+              - event: Transfer(indexed address,indexed address,uint256)
+                handler: handleTransfer
               - event: AccrueInterest(uint256,uint256,uint256)
                 handler: handleAccrueInterestOld
               - event: AccrueInterest(uint256,uint256,uint256,uint256)
                 handler: handleAccrueInterest
 # graft:
-#     base: QmZ5rehi2L26QGZi5t5y4MLi8XoF7nmv8cSWufamzm584F
-#     block: 9012625
+#     base: QmPduDAv1S7UB48bNJvuFB4BaJJKiVmvVQgeSjPkoQ7PXf
+#     block: 13098860

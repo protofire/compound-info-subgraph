@@ -17,11 +17,7 @@ import {
     COMP_SPEED_SPLIT_BLOCK_NUMBER,
 } from "../utils/constants";
 import { getUsdcPerEth, getUsdcPerUnderlying } from "./oracle";
-import {
-    tokenAmountToDecimal,
-    calculateApy,
-    calculateCompDistrubtionApy,
-} from "../utils/utils";
+import { tokenAmountToDecimal, calculateApy, calculateCompDistrubtionApy } from "../utils/utils";
 
 /**
  * Helper function to create a new market. This populates all fields which won't change throughout the lifetime of the market
@@ -29,10 +25,7 @@ import {
  * @param blockNumber block number when the new market got created
  * @returns a new Market object
  */
-export function createMarket(
-    marketAddress: Address,
-    blockNumber: BigInt
-): Market {
+export function createMarket(marketAddress: Address, blockNumber: BigInt): Market {
     log.info(`CREATING MARKET: ${marketAddress.toHexString()}`, []);
 
     const contract = CToken.bind(marketAddress);
@@ -69,9 +62,7 @@ export function createMarket(
             market.underlyingSymbol = underlyingContract.symbol();
         }
 
-        market.underlyingDecimals = BigInt.fromI32(
-            underlyingContract.decimals()
-        );
+        market.underlyingDecimals = BigInt.fromI32(underlyingContract.decimals());
     }
 
     market.collateralFactor = ZERO_BD;
@@ -109,10 +100,7 @@ export function createMarket(
  * @param marketAddress address of the cToken corresponding to the market
  * @param blockNumber block number that this function is being called
  */
-export function updateMarket(
-    marketAddress: Address,
-    blockNumber: BigInt
-): void {
+export function updateMarket(marketAddress: Address, blockNumber: BigInt): void {
     let market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
@@ -156,131 +144,81 @@ export function updateMarket(
                 .minus(market.cTokenDecimals)
         );
 
-        market.totalSupply = tokenAmountToDecimal(
-            contract.totalSupply(),
-            market.cTokenDecimals
-        ).times(market.underlyingPerCToken);
-
-        market.totalSupplyUsd = market.totalSupply.times(
-            market.usdcPerUnderlying
+        market.totalSupply = tokenAmountToDecimal(contract.totalSupply(), market.cTokenDecimals).times(
+            market.underlyingPerCToken
         );
 
-        market.totalReserves = tokenAmountToDecimal(
-            contract.totalReserves(),
-            market.underlyingDecimals
-        );
+        market.totalSupplyUsd = market.totalSupply.times(market.usdcPerUnderlying);
 
-        market.totalReservesUsd = market.totalReserves.times(
-            market.usdcPerUnderlying
-        );
+        market.totalReserves = tokenAmountToDecimal(contract.totalReserves(), market.underlyingDecimals);
+
+        market.totalReservesUsd = market.totalReserves.times(market.usdcPerUnderlying);
 
         market.utilization = market.totalSupply.notEqual(ZERO_BD)
             ? market.totalBorrow.div(market.totalSupply)
             : ZERO_BD;
 
-        market.totalBorrow = tokenAmountToDecimal(
-            contract.totalBorrows(),
-            market.underlyingDecimals
-        );
+        market.totalBorrow = tokenAmountToDecimal(contract.totalBorrows(), market.underlyingDecimals);
 
-        market.totalBorrowUsd = market.totalBorrow.times(
-            market.usdcPerUnderlying
-        );
+        market.totalBorrowUsd = market.totalBorrow.times(market.usdcPerUnderlying);
 
-        market.cash = tokenAmountToDecimal(
-            contract.getCash(),
-            market.underlyingDecimals
-        );
+        market.cash = tokenAmountToDecimal(contract.getCash(), market.underlyingDecimals);
 
         // Remove 10^18 that scales this value
-        market.supplyRatePerBlock = tokenAmountToDecimal(
-            contract.supplyRatePerBlock(),
-            BigInt.fromU32(18)
-        );
+        market.supplyRatePerBlock = tokenAmountToDecimal(contract.supplyRatePerBlock(), BigInt.fromU32(18));
 
         // Remove 10^18 that scales this value
-        market.borrowRatePerBlock = tokenAmountToDecimal(
-            contract.borrowRatePerBlock(),
-            BigInt.fromU32(18)
-        );
+        market.borrowRatePerBlock = tokenAmountToDecimal(contract.borrowRatePerBlock(), BigInt.fromU32(18));
 
         market.supplyApy = calculateApy(market.supplyRatePerBlock);
         market.borrowApy = calculateApy(market.borrowRatePerBlock);
 
-        market.reserveFactor = tokenAmountToDecimal(
-            contract.reserveFactorMantissa(),
-            BigInt.fromU32(18)
-        );
+        market.reserveFactor = tokenAmountToDecimal(contract.reserveFactorMantissa(), BigInt.fromU32(18));
 
         market.comptrollerAddress = contract.comptroller();
 
-        const comptrollerContract = Comptroller.bind(
-            changetype<Address>(market.comptrollerAddress)
-        );
+        const comptrollerContract = Comptroller.bind(changetype<Address>(market.comptrollerAddress));
 
         const tryMarkets = comptrollerContract.try_markets(contractAddress);
 
         if (!tryMarkets.reverted) {
-            market.collateralFactor = tokenAmountToDecimal(
-                tryMarkets.value.value1,
-                BigInt.fromU32(18)
-            );
+            market.collateralFactor = tokenAmountToDecimal(tryMarkets.value.value1, BigInt.fromU32(18));
         }
 
         // No try_borrowCaps for this compreoller abi
-        const tryBorrowCaps = comptrollerContract.try_borrowCaps(
-            contractAddress
-        );
+        const tryBorrowCaps = comptrollerContract.try_borrowCaps(contractAddress);
 
         if (!tryBorrowCaps.reverted) {
-            market.borrowCap = tokenAmountToDecimal(
-                tryBorrowCaps.value,
-                BigInt.fromU32(18)
-            );
+            market.borrowCap = tokenAmountToDecimal(tryBorrowCaps.value, BigInt.fromU32(18));
         }
 
         if (blockNumber.lt(COMP_SPEED_SPLIT_BLOCK_NUMBER)) {
-            const tryCompSpeeds = comptrollerContract.try_compSpeeds(
-                marketAddress
-            );
+            const tryCompSpeeds = comptrollerContract.try_compSpeeds(marketAddress);
 
             if (tryCompSpeeds.reverted) {
                 market.compSpeedSupply = ZERO_BD;
                 market.compSpeedBorrow = ZERO_BD;
             } else {
-                market.compSpeedSupply = tokenAmountToDecimal(
-                    tryCompSpeeds.value,
-                    BigInt.fromU32(18)
-                );
+                market.compSpeedSupply = tokenAmountToDecimal(tryCompSpeeds.value, BigInt.fromU32(18));
                 market.compSpeedBorrow = market.compSpeedSupply;
             }
         } else {
-            const tryCompSupplySpeeds = comptrollerContract.try_compSupplySpeeds(
-                marketAddress
-            );
+            const tryCompSupplySpeeds = comptrollerContract.try_compSupplySpeeds(marketAddress);
 
             if (tryCompSupplySpeeds.reverted) {
                 market.compSpeedSupply = ZERO_BD;
             } else {
                 // Comp speeds with the 10^18 scaling removed
-                market.compSpeedSupply = tokenAmountToDecimal(
-                    tryCompSupplySpeeds.value,
-                    BigInt.fromU32(18)
-                );
+                market.compSpeedSupply = tokenAmountToDecimal(tryCompSupplySpeeds.value, BigInt.fromU32(18));
             }
 
-            const tryCompBorrowSpeeds = comptrollerContract.try_compBorrowSpeeds(
-                marketAddress
-            );
+            const tryCompBorrowSpeeds = comptrollerContract.try_compBorrowSpeeds(marketAddress);
 
             if (tryCompBorrowSpeeds.reverted) {
                 market.compSpeedBorrow = ZERO_BD;
             } else {
                 // Comp speeds with the 10^18 scaling removed
-                market.compSpeedBorrow = tokenAmountToDecimal(
-                    tryCompBorrowSpeeds.value,
-                    BigInt.fromU32(18)
-                );
+                market.compSpeedBorrow = tokenAmountToDecimal(tryCompBorrowSpeeds.value, BigInt.fromU32(18));
             }
         }
 
@@ -301,14 +239,10 @@ export function updateMarket(
         market.totalSupplyApy = market.supplyApy.plus(compSupplyApy);
         market.totalBorrowApy = market.borrowApy.minus(compBorrowApy);
 
-        let availableLiquidty = market.totalSupply
-            .times(market.collateralFactor)
-            .minus(market.totalBorrow);
+        let availableLiquidty = market.totalSupply.times(market.collateralFactor).minus(market.totalBorrow);
 
         // Clamp to min of 0
-        availableLiquidty = availableLiquidty.lt(ZERO_BD)
-            ? ZERO_BD
-            : availableLiquidty;
+        availableLiquidty = availableLiquidty.lt(ZERO_BD) ? ZERO_BD : availableLiquidty;
 
         // If there is a borrow cap, inforce it
         if (market.borrowCap.notEqual(ZERO_BD)) {
@@ -322,9 +256,7 @@ export function updateMarket(
 
         market.availableLiquidity = availableLiquidty;
 
-        market.availableLiquidityUsd = market.availableLiquidity.times(
-            market.usdcPerUnderlying
-        );
+        market.availableLiquidityUsd = market.availableLiquidity.times(market.usdcPerUnderlying);
 
         market.save();
     }

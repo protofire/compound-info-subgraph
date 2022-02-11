@@ -31,7 +31,7 @@ import {
 } from "../../generated/schema";
 
 import { updateMarket } from "../mapping-helpers/market";
-import { createUser } from "../mapping-helpers/user";
+import { createUser, updateUserAggregates } from "../mapping-helpers/user";
 import { updateProtocolSummaryData } from "../mapping-helpers/protocol";
 import {
     updateMarketDayData,
@@ -99,10 +99,12 @@ export function handleMint(event: MintEvent): void {
     // Update balances, this will also create the user and userMarket if they don't exist already
     updateUserMarketBalance(userAddress, marketAddress, blockNumber);
 
-    const userMarketId =
-        userAddress.toHexString() + marketAddress.toHexString();
+    // Update the user aggregates after the UserMarket has been updated
+    updateUserAggregates(userAddress);
 
     // Create mint event
+    const userMarketId =
+        userAddress.toHexString() + marketAddress.toHexString();
     const mint = new Mint(event.transaction.hash.toHexString());
     mint.blockNumber = blockNumber;
     mint.date = event.block.timestamp;
@@ -139,10 +141,12 @@ export function handleRedeem(event: RedeemEvent): void {
     // Update balances, this will also create the user and userMarket if they don't exist already
     updateUserMarketBalance(userAddress, marketAddress, blockNumber);
 
-    const userMarketId =
-        userAddress.toHexString() + marketAddress.toHexString();
+    // Update the user aggregates after the UserMarket has been updated
+    updateUserAggregates(userAddress);
 
     // Create redeem event
+    const userMarketId =
+        userAddress.toHexString() + marketAddress.toHexString();
     const redeem = new Redeem(event.transaction.hash.toHexString());
     redeem.blockNumber = blockNumber;
     redeem.date = event.block.timestamp;
@@ -178,10 +182,12 @@ export function handleBorrow(event: BorrowEvent): void {
     // Update balances, this will also create the user and userMarket if they don't exist already
     updateUserMarketBalance(userAddress, marketAddress, blockNumber);
 
-    const userMarketId =
-        userAddress.toHexString() + marketAddress.toHexString();
+    // Update the user aggregates after the UserMarket has been updated
+    updateUserAggregates(userAddress);
 
     // Create borrow event
+    const userMarketId =
+        userAddress.toHexString() + marketAddress.toHexString();
     const borrow = new Borrow(event.transaction.hash.toHexString());
     borrow.blockNumber = blockNumber;
     borrow.date = event.block.timestamp;
@@ -213,10 +219,12 @@ export function handleRepayBorrow(event: RepayBorrowEvent): void {
     // Update balances, this will also create the user and userMarket if they don't exist already
     updateUserMarketBalance(userAddress, marketAddress, blockNumber);
 
+    // Update the user aggregates after the UserMarket has been updated
+    updateUserAggregates(userAddress);
+
+    // Create repay borrow event
     const userMarketId =
         userAddress.toHexString() + marketAddress.toHexString();
-
-    // Create borrow event
     const repayBorrow = new RepayBorrow(event.transaction.hash.toHexString());
     repayBorrow.blockNumber = event.block.number;
     repayBorrow.date = event.block.timestamp;
@@ -269,14 +277,17 @@ export function handleLiquidateBorrow(event: LiquidateBorrowEvent): void {
     // Liquidator got the seized cTokens, the cTokenBalance for this userMarket will increase
     updateUserMarketBalance(liquidatorAddress, seizeMarketAddress, blockNumber);
 
+    // Update the user aggregates after the UserMarket has been updated
+    updateUserAggregates(borrowerAddress);
+    updateUserAggregates(liquidatorAddress);
+
+    // Create liquidation event
     const borrowerUserLiquidationMarketId =
         borrowerAddress.toHexString() + liquidationMarketAddress.toHexString();
     const borrowerUserSeizeMarketId =
         borrowerAddress.toHexString() + seizeMarketAddress.toHexString();
     const liquidatorUserMarketId =
         liquidatorAddress.toHexString() + seizeMarketAddress.toHexString();
-
-    // Create liquidation event
     const liquidation = new Liquidation(event.transaction.hash.toHexString());
     liquidation.blockNumber = blockNumber;
     liquidation.date = event.block.timestamp;
@@ -328,12 +339,15 @@ export function handleTransfer(event: TransferEvent): void {
     updateUserMarketBalance(fromAddress, marketAddress, blockNumber);
     updateUserMarketBalance(toAddress, marketAddress, blockNumber);
 
+    // Update the user aggregates after the UserMarket has been updated
+    updateUserAggregates(fromAddress);
+    updateUserAggregates(toAddress);
+
+    // Create transfer event
     const fromUserMarketId =
         fromAddress.toHexString() + marketAddress.toHexString();
     const toUserMarketId =
         toAddress.toHexString() + marketAddress.toHexString();
-
-    // Create transfer event
     const transfer = new Transfer(event.transaction.hash.toHexString());
     transfer.blockNumber = blockNumber;
     transfer.date = event.block.timestamp;
