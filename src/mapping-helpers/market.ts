@@ -15,6 +15,7 @@ import {
     ZERO_BD,
     MKR_ADDRESS,
     COMP_SPEED_SPLIT_BLOCK_NUMBER,
+    LEGACY_CWBTC_ADDRESS,
 } from "../utils/constants";
 import { getUsdcPerEth, getUsdcPerUnderlying } from "./oracle";
 import { tokenAmountToDecimal, calculateApy, calculateCompDistrubtionApy } from "../utils/utils";
@@ -57,6 +58,9 @@ export function createMarket(marketAddress: Address, blockNumber: BigInt): Marke
             // MKR contract returns garbage for name and symbol
             market.underlyingName = "Maker token";
             market.underlyingSymbol = "MKR";
+        } else if (marketAddress.toHexString() == LEGACY_CWBTC_ADDRESS) {
+            market.underlyingName = "Legacy WBTC";
+            market.underlyingSymbol = "WBTCL";
         } else {
             market.underlyingName = underlyingContract.name();
             market.underlyingSymbol = underlyingContract.symbol();

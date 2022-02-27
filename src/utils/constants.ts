@@ -13,8 +13,8 @@ export const MKR_ADDRESS = "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2";
 export const CUSDC_ADDRESS = "0x39aa39c021dfbae8fac545936693ac917d5e7563";
 export const COMP_ADDRESS = "0xc00e94Cb662C3520282E6f5717214004A7f26888";
 export const CCOMP_ADDRESS = "0x70e36f6bf80a52b3b46b3af8e106cc0ed743e8e4";
-export const PRICE_ORACLE_1_ADDRESS =
-    "0x02557a5e05defeffd4cae6d83ea3d173b272c904"; // Used for ~100 blocks at the beginning of the protocol
+export const PRICE_ORACLE_1_ADDRESS = "0x02557a5e05defeffd4cae6d83ea3d173b272c904"; // Used for ~100 blocks at the beginning of the protocol
+export const LEGACY_CWBTC_ADDRESS = "0xc11b1268c1a384e55c48c2391d8d480264a3a7f4";
 
 export const PROTOCOL_ID = "1";
 
@@ -23,9 +23,7 @@ export const SEC_PER_DAY = BigInt.fromU32(86400);
 export const SEC_PER_WEEK = BigInt.fromU32(604800);
 
 export const PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER = BigInt.fromU32(7715908);
-export const GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER = BigInt.fromU32(
-    10678764
-);
+export const GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER = BigInt.fromU32(10678764);
 export const COMP_SPEED_SPLIT_BLOCK_NUMBER = BigInt.fromU32(13322798);
 
 export const SEC_PER_BLOCK = BigDecimal.fromString("13.5");

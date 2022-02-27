@@ -11,11 +11,12 @@ export function createUserMarket(userAddress: Address, marketAddress: Address, b
     const marketId = marketAddress.toHexString();
     const userMarketId = userId + marketId;
 
-    const user = User.load(userId);
+    let user = User.load(userId);
     if (user == null) {
         // Should never happen
         log.warning("*** ERROR: create user market was called with a non existant user", []);
-        return;
+        user = createUser(userAddress, blockNumber);
+        user.save();
     }
 
     const userMarket = new UserMarket(userMarketId);
