@@ -1,14 +1,18 @@
-import { Address } from "@graphprotocol/graph-ts";
+import { Address, log } from "@graphprotocol/graph-ts";
 
 import {
     MarketListed as MarketListedEvent,
     NewPriceOracle as NewPriceOracleEvent,
+    MarketEntered as MarketEnteredEvent,
+    MarketExited as MarketExitedEvent,
 } from "../../generated/comptroller/comptroller";
-import { Protocol } from "../../generated/schema";
+import { Market, Protocol, User, UserMarket } from "../../generated/schema";
 import { CToken as CTokenTemplate } from "../../generated/templates";
 
 import { createMarket } from "../mapping-helpers/market";
 import { createProtocol } from "../mapping-helpers/protocol";
+import { createUser } from "../mapping-helpers/user";
+import { createUserMarket } from "../mapping-helpers/userMarket";
 import {
     PROTOCOL_ID,
     PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER,
@@ -60,4 +64,78 @@ export function handleNewPriceOracle(event: NewPriceOracleEvent): void {
     protocol.priceOracle = event.params.newPriceOracle;
     protocol.lastNewOracleBlockNumber = blockNumber;
     protocol.save();
+}
+
+/**
+ * Emitted when a user decides to use this market as collatoral
+ */
+export function handleMarketEntered(event: MarketEnteredEvent): void {
+    const marketAddress = event.params.cToken;
+    const userAddress = event.params.account;
+    const blockNumber = event.block.number;
+
+    const market = Market.load(marketAddress.toHexString());
+    let user = User.load(userAddress.toHexString());
+
+    if (market == null) {
+        // Won't happen
+        log.warning("*** ERROR: market was null in handleMarketEntered()", []);
+        return;
+    }
+
+    // Create user if it doesn't exist
+    if (user == null) {
+        user = createUser(userAddress, blockNumber);
+        user.save();
+    }
+
+    const userMarketId = market.id + user.id;
+
+    let userMarket = UserMarket.load(userMarketId);
+
+    // Create marketUser if it doesn't exist
+    if (userMarket == null) {
+        userMarket = createUserMarket(userAddress, marketAddress, blockNumber);
+    }
+
+    userMarket.enteredMarket = true;
+
+    userMarket.save();
+}
+
+/**
+ * Emitted when a user decides to stop using this market as collatoral
+ */
+export function handleMarketExited(event: MarketExitedEvent): void {
+    const marketAddress = event.address;
+    const userAddress = event.params.account;
+    const blockNumber = event.block.number;
+
+    const market = Market.load(marketAddress.toHexString());
+    let user = User.load(userAddress.toHexString());
+
+    if (market == null) {
+        // Won't happen
+        log.warning("*** ERROR: market was null in handleMarketEntered()", []);
+        return;
+    }
+
+    // Create user if it doesn't exist
+    if (user == null) {
+        user = createUser(userAddress, blockNumber);
+        user.save();
+    }
+
+    const userMarketId = market.id + user.id;
+
+    let userMarket = UserMarket.load(userMarketId);
+
+    // Create marketUser if it doesn't exist
+    if (userMarket == null) {
+        userMarket = createUserMarket(userAddress, marketAddress, blockNumber);
+    }
+
+    userMarket.enteredMarket = false;
+
+    userMarket.save();
 }

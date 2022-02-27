@@ -1,241 +1,403 @@
 type Protocol @entity {
-    # only one of these
+    "only one of these (id=1)"
     id: ID!
-    # address of price oracle the comptroller uses
+    "address of price oracle the comptroller uses"
     priceOracle: Bytes!
-    # block number when the price oracle was last updated
+    "block number when the price oracle was last updated"
     lastNewOracleBlockNumber: BigInt!
 
-    # most recent block number where the protocol summary data was updated
+    "most recent block number where the protocol summary data was updated"
     latestBlockNumber: BigInt!
-    # all the markets that the comptroller controls
+    "all the markets that the comptroller controls"
     markets: [Market!]! # this can't be a derived field as we need access to it in the historicalWeekData mapping
-    # total supply of the entire protocol in USD
+    "total supply of the entire protocol in USD"
     totalSupplyUsd: BigDecimal!
-    # total borrow of the entire protocol in USD
+    "total borrow of the entire protocol in USD"
     totalBorrowUsd: BigDecimal!
-    # total reserves of the entire protocol in USD
+    "total reserves of the entire protocol in USD"
     totalReservesUsd: BigDecimal!
-    # utilization of the entire protocol
+    "utilization of the entire protocol"
     utilization: BigDecimal!
 
-    # historical data in weekly intervals of the entire protocol
+    "historical data in weekly intervals of the entire protocol"
     historicalWeekData: [ProtocolWeekData!]! @derivedFrom(field: "protocol")
 }
 
 type Market @entity {
-    # cToken address
+    "cToken address"
     id: ID!
-    # block number when the market was created
+    "block number when the market was created"
     creationBlockNumber: BigInt!
-    # most recent block number where the market was updated
+    "most recent block number where the market was updated"
     latestBlockNumber: BigInt!
-    # cToken symbol
+    "cToken symbol"
     cTokenSymbol: String!
-    # number of decimals of the cToken
+    "number of decimals of the cToken"
     cTokenDecimals: BigInt!
-    # underlying token name
+    "underlying token name"
     underlyingName: String!
-    # underlying token symbol
+    "underlying token symbol"
     underlyingSymbol: String!
-    # underlying token address
+    "underlying token address"
     underlyingAddress: Bytes!
-    # number of decimals of the underlying token
+    "number of decimals of the underlying token"
     underlyingDecimals: BigInt!
-    # comptroller address
+    "comptroller address"
     comptrollerAddress: Bytes!
-    # collator factor in decimal form
+    "total number of unique suppliers to the market"
+    numberOfSuppliers: BigInt!
+    "total number of unique borrowers to the market"
+    numberOfBorrowers: BigInt!
+    "list of all UserMarket positions that belong to this market"
+    userMarkets: [UserMarket!]! @derivedFrom(field: "market")
+    "collator factor in decimal form"
     collateralFactor: BigDecimal!
-    # reserve factor in decimal form
+    "reserve factor in decimal form"
     reserveFactor: BigDecimal!
-    # borrow cap in underlying tokens
+    "borrow cap in underlying tokens"
     borrowCap: BigDecimal!
-    # amount of underlying owned by the contract
+    "amount of underlying owned by the contract"
     cash: BigDecimal!
-    # price of underlying tokens in cTokens
-    cTokenPerUnderlying: BigDecimal!
-    # supply rate per block, this is the value from the contract with the 10^18 scaling removed
+    "number of underlying one cToken is worth (exchange_rate)"
+    underlyingPerCToken: BigDecimal!
+    "supply rate per block, this is the value from the contract with the 10^18 scaling removed"
     supplyRatePerBlock: BigDecimal!
-    # borrow rate per block, this is the value from the contract with the 10^18 scaling removed
+    "borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
     borrowRatePerBlock: BigDecimal!
-    # supply apy not including the COMP distribution in decimal form
+    "supply apy not including the COMP distribution in decimal form"
     supplyApy: BigDecimal!
-    # borrow apy not including the COMP distribution in decimal form
+    "borrow apy not including the COMP distribution in decimal form"
     borrowApy: BigDecimal!
-    # total supply apy including the COMP distribution in decimal form
+    "total supply apy including the COMP distribution in decimal form"
     totalSupplyApy: BigDecimal!
-    # total borrow apy including the COMP distribution in decimal form
+    "total borrow apy including the COMP distribution in decimal form"
     totalBorrowApy: BigDecimal!
-    # total amount of underlying tokens supplied
+    "total amount of underlying tokens supplied"
     totalSupply: BigDecimal!
-    # total amount supplied in USD
+    "total amount supplied in USD"
     totalSupplyUsd: BigDecimal!
-    # total amount of underlying tokens borrowed
+    "total amount of underlying tokens borrowed"
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD
+    "total amount borrowed in USD"
     totalBorrowUsd: BigDecimal!
-    # total amount of underlying token in reserves
+    "total amount of underlying token in reserves"
     totalReserves: BigDecimal!
-    # total amount in reserves in USD
+    "total amount in reserves in USD"
     totalReservesUsd: BigDecimal!
-    # total available to be borrowed in the underlying asset
+    "total available to be borrowed in the underlying asset"
     availableLiquidity: BigDecimal!
-    # total available to be borrowed in USD
+    "total available to be borrowed in USD"
     availableLiquidityUsd: BigDecimal!
-    # utilization
+    "utilization"
     utilization: BigDecimal!
-    # COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed
+    "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
     compSpeedSupply: BigDecimal!
-    # COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed
+    "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
     compSpeedBorrow: BigDecimal!
-    # number of usdc one underlying token is worth
+    "number of usdc one underlying token is worth"
     usdcPerUnderlying: BigDecimal!
-    # number of usdc one eth is worth
+    "number of usdc one eth is worth"
     usdcPerEth: BigDecimal!
-    # price of COMP token in USDC
+    "number of usdc one comp is worth"
     usdcPerComp: BigDecimal!
 
-    # historical data in hourly intervals
+    "historical data in hourly intervals"
     historicalHourData: [MarketHourData!]! @derivedFrom(field: "market")
-    # historical data in daily intervals
+    "historical data in daily intervals"
     historicalDayData: [MarketDayData!]! @derivedFrom(field: "market")
-    # historical data in weekly intervals
+    "historical data in weekly intervals"
     historicalWeekData: [MarketWeekData!]! @derivedFrom(field: "market")
 }
 
 type MarketHourData @entity {
-    # token address concatendated with date
+    "token address concatendated with date"
     id: ID!
-    # market that this data belongs to
+    "market that this data belongs to"
     market: Market!
-    # unix timestamp in seconds rounded to the start of the hour
+    "unix timestamp in seconds rounded to the start of the hour"
     date: BigInt!
-    # supply apy not including the COMP distribution in decimal form
+    "supply apy not including the COMP distribution in decimal form"
     supplyApy: BigDecimal!
-    # borrow apy not including the COMP distribution in decimal form
+    "borrow apy not including the COMP distribution in decimal form"
     borrowApy: BigDecimal!
-    # total supply apy including the COMP distribution in decimal form
+    "total supply apy including the COMP distribution in decimal form"
     totalSupplyApy: BigDecimal!
-    # total borrow apy including the COMP distribution in decimal form
+    "total borrow apy including the COMP distribution in decimal form"
     totalBorrowApy: BigDecimal!
-    # total amount of underlying tokens supplied over time
+    "total amount of underlying tokens supplied over time"
     totalSupply: BigDecimal!
-    # total amount supplied in USD
+    "total amount supplied in USD"
     totalSupplyUsd: BigDecimal!
-    # total amount of underlying tokens borrowed over time
+    "total amount of underlying tokens borrowed over time"
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD
+    "total amount borrowed in USD"
     totalBorrowUsd: BigDecimal!
-    # total amount of underlying token in reserves over time
+    "total amount of underlying token in reserves over time"
     totalReserves: BigDecimal!
-    # total amount in reseres in USD
+    "total amount in reseres in USD"
     totalReservesUsd: BigDecimal!
-    # utilization
+    "utilization"
     utilization: BigDecimal!
-    # price of the underlying token in USDC
+    "price of the underlying token in USDC"
     usdcPerUnderlying: BigDecimal!
-    # number of usdc one eth is worth
+    "number of usdc one eth is worth"
     usdcPerEth: BigDecimal!
-    # price of COMP token in USDC
+    "price of COMP token in USDC"
     usdcPerComp: BigDecimal!
 
-    # number of transactions that went into deriving this data entry
+    "number of transactions that went into deriving this data entry"
     txCount: BigInt!
 }
 
 type MarketDayData @entity {
-    # token address concatendated with date
+    "token address concatendated with date"
     id: ID!
-    # market that this data belongs to
+    "market that this data belongs to"
     market: Market!
-    # unix timestamp in seconds rounded to the start of the day
+    "unix timestamp in seconds rounded to the start of the day"
     date: BigInt!
-    # supply apy not including the COMP distribution in decimal form
+    "supply apy not including the COMP distribution in decimal form"
     supplyApy: BigDecimal!
-    # borrow apy not including the COMP distribution in decimal form
+    "borrow apy not including the COMP distribution in decimal form"
     borrowApy: BigDecimal!
-    # total supply apy including the COMP distribution in decimal form
+    "total supply apy including the COMP distribution in decimal form"
     totalSupplyApy: BigDecimal!
-    # total borrow apy including the COMP distribution in decimal form
+    "total borrow apy including the COMP distribution in decimal form"
     totalBorrowApy: BigDecimal!
-    # total amount of underlying tokens supplied over time
+    "total amount of underlying tokens supplied over time"
     totalSupply: BigDecimal!
-    # total amount supplied in USD
+    "total amount supplied in USD"
     totalSupplyUsd: BigDecimal!
-    # total amount of underlying tokens borrowed over time
+    "total amount of underlying tokens borrowed over time"
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD
+    "total amount borrowed in USD"
     totalBorrowUsd: BigDecimal!
-    # total amount of underlying token in reserves over time
+    "total amount of underlying token in reserves over time"
     totalReserves: BigDecimal!
-    # total amount in reseres in USD
+    "total amount in reseres in USD"
     totalReservesUsd: BigDecimal!
-    # utilization
+    "utilization"
     utilization: BigDecimal!
-    # price of the underlying token in USDC
+    "price of the underlying token in USDC"
     usdcPerUnderlying: BigDecimal!
-    # number of usdc one eth is worth
+    "number of usdc one eth is worth"
     usdcPerEth: BigDecimal!
-    # price of COMP token in USDC
+    "price of COMP token in USDC"
     usdcPerComp: BigDecimal!
-    # number of transactions that went into deriving this data entry
+    "number of transactions that went into deriving this data entry"
     txCount: BigInt!
 }
 
 type MarketWeekData @entity {
-    # token address concatendated with date
+    "token address concatendated with date"
     id: ID!
-    # market that this data belongs to
+    "market that this data belongs to"
     market: Market!
-    # unix timestamp in seconds rounded to the start of the week
+    "unix timestamp in seconds rounded to the start of the week"
     date: BigInt!
-    # supply apy not including the COMP distribution in decimal form
+    "supply apy not including the COMP distribution in decimal form"
     supplyApy: BigDecimal!
-    # borrow apy not including the COMP distribution in decimal form
+    "borrow apy not including the COMP distribution in decimal form"
     borrowApy: BigDecimal!
-    # total supply apy including the COMP distribution in decimal form
+    "total supply apy including the COMP distribution in decimal form"
     totalSupplyApy: BigDecimal!
-    # total borrow apy including the COMP distribution in decimal form
+    "total borrow apy including the COMP distribution in decimal form"
     totalBorrowApy: BigDecimal!
-    # total amount of underlying tokens supplied over time
+    "total amount of underlying tokens supplied over time"
     totalSupply: BigDecimal!
-    # total amount supplied in USD
+    "total amount supplied in USD"
     totalSupplyUsd: BigDecimal!
-    # total amount of underlying tokens borrowed over time
+    "total amount of underlying tokens borrowed over time"
     totalBorrow: BigDecimal!
-    # total amount borrowed in USD
+    "total amount borrowed in USD"
     totalBorrowUsd: BigDecimal!
-    # total amount of underlying token in reserves over time
+    "total amount of underlying token in reserves over time"
     totalReserves: BigDecimal!
-    # total amount in reseres in USD
+    "total amount in reseres in USD"
     totalReservesUsd: BigDecimal!
-    # utilization
+    "utilization"
     utilization: BigDecimal!
-    # price of the underlying token in USDC
+    "price of the underlying token in USDC"
     usdcPerUnderlying: BigDecimal!
-    # number of usdc one eth is worth
+    "number of usdc one eth is worth"
     usdcPerEth: BigDecimal!
-    # price of COMP token in USDC
+    "price of COMP token in USDC"
     usdcPerComp: BigDecimal!
-    # number of transactions that went into deriving this data entry
+    "number of transactions that went into deriving this data entry"
     txCount: BigInt!
 }
 
 type ProtocolWeekData @entity {
-    # token address concatendated with date
+    "token address concatendated with date"
     id: ID!
-    # comptroller of the protocol
+    "comptroller of the protocol"
     protocol: Protocol!
-    # unix timestamp in seconds rounded to the start of the week
+    "unix timestamp in seconds rounded to the start of the week"
     date: BigInt!
-    # total amount of supplied in USD of the entire protocol
+    "total amount of supplied in USD of the entire protocol"
     totalSupplyUsd: BigDecimal!
-    # total amount of borrowed in USD of the entire protocol
+    "total amount of borrowed in USD of the entire protocol"
     totalBorrowUsd: BigDecimal!
-    # total amount of reserves in USD of the entire protocol
+    "total amount of reserves in USD of the entire protocol"
     totalReservesUsd: BigDecimal!
-    # utilization
+    "utilization"
     utilization: BigDecimal!
-    # number of transactions that went into deriving this data entry
+    "number of transactions that went into deriving this data entry"
     txCount: BigInt!
+}
+
+type User @entity {
+    "users wallet address"
+    id: ID!
+    "block number the user was created"
+    creationBlockNumber: BigInt!
+    "most recent block number where the user was updated"
+    lastBlockNumber: BigInt!
+    "list of all UserMarket positions that belong to this user"
+    userMarkets: [UserMarket!]! # Can't be derived becuase the list of user markets is needed to computer total supply/borrow aggregates
+    "aggregate total of all supplied tokens by the user in all markets in USD"
+    totalSupplyUsd: BigDecimal!
+    "aggregate total of all borrowed tokens by the user in all markets in USD"
+    totalBorrowUsd: BigDecimal!
+}
+
+"Pairing for a single user to a single market, this repesents a users position in a market"
+type UserMarket @entity {
+    "concatenation of market cToken address and user address"
+    id: ID!
+    "user in pairing"
+    user: User!
+    "market in pairing"
+    market: Market!
+    "block number the user market was created"
+    creationBlockNumber: BigInt!
+    "most recent block number where the AccountMarket was updated"
+    latestBlockNumber: BigInt!
+    "if the market is entered by the user"
+    enteredMarket: Boolean!
+    "total amount of underlying supplied by the user to the market, this increases with accrueInterest, this value is from the latestBlockNumber"
+    # a more accure value can be calculated by taking cTokenBalance * market.underlyingPerCToken
+    totalSupply: BigDecimal!
+    "total amount supplied in usd equivilent"
+    totalSupplyUsd: BigDecimal!
+    "total amount of underlying borrowed by the user from the market plus the interest, this increases with accrueInterest, this value is from the latestBlockNumber"
+    totalBorrow: BigDecimal!
+    "total amount borrowed in usd equivilent"
+    totalBorrowUsd: BigDecimal!
+    "number of cTokens of this market the user owns, this stays fixed with accrueInterest"
+    cTokenBalance: BigDecimal!
+    "mint events from this market made by the user"
+    mints: [Mint!]! @derivedFrom(field: "userMarket")
+    "redeem events to this market made by the user"
+    redeems: [Redeem!]! @derivedFrom(field: "userMarket")
+    "borrow events from this market made by the user"
+    borrows: [Borrow!]! @derivedFrom(field: "userMarket")
+    "repay events to this market made by the user"
+    repayBorrows: [RepayBorrow!]! @derivedFrom(field: "userMarket")
+    "transfer events of the market cToken from the user to another user"
+    fromTransfers: [Transfer!]! @derivedFrom(field: "fromUserMarket")
+    "transfer events of the market cToken to the user from another user"
+    toTransfers: [Transfer!]! @derivedFrom(field: "toUserMarket")
+    "list of all liquidations the user has recieved in this market (i.e user had their borrow repayed in the markets underlying asset)"
+    receivedLiquidations: [Liquidation!]! @derivedFrom(field: "borrowerUserLiquidationMarket")
+    "list of all seizes where the market cToken was seized from the user in a liquidation"
+    seizeLiquidations: [Liquidation!]! @derivedFrom(field: "borrowerUserSeizeMarket")
+    "list of all liquidations the user had performed where they seized cTokens of this market (i.e user repayed another users borrow)"
+    performedLiquidations: [Liquidation!]! @derivedFrom(field: "liquidatorUserMarket")
+}
+
+# mint: underlying <-> ctoken
+type Mint @entity {
+    "transaction hash"
+    id: ID!
+    "block number the transation occured"
+    blockNumber: BigInt!
+    "unix timestamp in seconds the transaction was made"
+    date: BigInt!
+    "UserMarket the transaction belongs to"
+    userMarket: UserMarket!
+    "underlying amount for the part of the transaction in the underlying token"
+    underlyingAmount: BigDecimal!
+    "cToken amount for the part of the transaction in cTokens"
+    cTokenAmount: BigDecimal!
+}
+
+# redeem: cToken <-> underlying
+type Redeem @entity {
+    "transaction hash"
+    id: ID!
+    "block number the transation occured"
+    blockNumber: BigInt!
+    "unix timestamp in seconds the transaction was made"
+    date: BigInt!
+    "UserMarket the transaction belongs to"
+    userMarket: UserMarket!
+    "underlying amount for the part of the transaction in the underlying token"
+    underlyingAmount: BigDecimal!
+    "cToken amount for the part of the transaction in cTokens"
+    cTokenAmount: BigDecimal!
+}
+
+# borrow: underlying
+type Borrow @entity {
+    "transaction hash"
+    id: ID!
+    "block number the transation occured"
+    blockNumber: BigInt!
+    "unix timestamp in seconds the transaction was made"
+    date: BigInt!
+    "UserMarket the transaction belongs to"
+    userMarket: UserMarket!
+    "underlying amount for the part of the transaction in the underlying token"
+    underlyingAmount: BigDecimal!
+}
+
+# repay: underlying
+type RepayBorrow @entity {
+    "transaction hash"
+    id: ID!
+    "block number the transation occured"
+    blockNumber: BigInt!
+    "unix timestamp in seconds the transaction was made"
+    date: BigInt!
+    "UserMarket the transaction belongs to"
+    userMarket: UserMarket!
+    "underlying amount for the part of the transaction in the underlying token"
+    underlyingAmount: BigDecimal!
+}
+
+# transfer: cToken
+type Transfer @entity {
+    "transaction hash"
+    id: ID!
+    "block number the transation occured"
+    blockNumber: BigInt!
+    "unix timestamp in seconds the transaction was made"
+    date: BigInt!
+    "UserMarket the transaction came from"
+    fromUserMarket: UserMarket!
+    "UserMarket the transaction is going to"
+    toUserMarket: UserMarket!
+    "cToken amount for the part of the transaction in cTokens"
+    cTokenAmount: BigDecimal!
+}
+
+# liquidation: underlying token from borrowerMarket's market <-> cTokens of liquidatorMarket's market
+type Liquidation @entity {
+    "transaction hash"
+    id: ID!
+    "block number of the liquidation"
+    blockNumber: BigInt!
+    "unix timestamp in seconds the liqudation was made"
+    date: BigInt!
+    "user being liquidated and the market they are being liquidated in"
+    borrowerUserLiquidationMarket: UserMarket!
+    "user being liquidated and the market they are having cTokens seized from"
+    borrowerUserSeizeMarket: UserMarket!
+    "user doing the liquidation and the market they are seizing cTokens in"
+    liquidatorUserMarket: UserMarket!
+    "amount of the underlying tokens of borrowerMarket's market which are being repayed by the liquidator"
+    repayAmount: BigDecimal!
+    "amount of the cTokens of liquidatorMarket's market which are being seized by the liquidator"
+    seizeAmount: BigDecimal!
 }

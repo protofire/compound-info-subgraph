@@ -48,10 +48,7 @@ export function getUsdcPerUnderlying(
 ): BigDecimal {
     let usdcPerUnderlying: BigDecimal;
     if (blockNumber.lt(PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER)) {
-        usdcPerUnderlying = getUsdcPerUnderlyingFromOracleOne(
-            underlyingAddress,
-            usdcPerEth
-        );
+        usdcPerUnderlying = getUsdcPerUnderlyingFromOracleOne(underlyingAddress, usdcPerEth);
     } else {
         usdcPerUnderlying = getUsdcPerUnderlyingAfterOracleOne(
             cTokenAddress,
@@ -66,10 +63,7 @@ export function getUsdcPerUnderlying(
 
 //// Helpers
 
-function getUsdcPerUnderlyingFromOracleOne(
-    underlyingAddress: Address,
-    usdcPerEth: BigDecimal
-): BigDecimal {
+function getUsdcPerUnderlyingFromOracleOne(underlyingAddress: Address, usdcPerEth: BigDecimal): BigDecimal {
     const oracleAddress = Address.fromString(PRICE_ORACLE_1_ADDRESS);
     const oracle = PriceOracle1.bind(oracleAddress);
 
@@ -82,18 +76,11 @@ function getUsdcPerUnderlyingFromOracleOne(
     }
 
     // Scaled by 10^18 when stored
-    const ethPerUnderlying = tokenAmountToDecimal(
-        ethPerUnderlyingScaled.value,
-        BigInt.fromU32(18)
-    );
+    const ethPerUnderlying = tokenAmountToDecimal(ethPerUnderlyingScaled.value, BigInt.fromU32(18));
 
-    const underlyingPerEth = ethPerUnderlying.notEqual(ZERO_BD)
-        ? ONE_BD.div(ethPerUnderlying)
-        : ZERO_BD;
+    const underlyingPerEth = ethPerUnderlying.notEqual(ZERO_BD) ? ONE_BD.div(ethPerUnderlying) : ZERO_BD;
 
-    return usdcPerEth.notEqual(ZERO_BD)
-        ? underlyingPerEth.div(usdcPerEth)
-        : ZERO_BD;
+    return usdcPerEth.notEqual(ZERO_BD) ? underlyingPerEth.div(usdcPerEth) : ZERO_BD;
 }
 
 function getUsdcPerUnderlyingAfterOracleOne(
@@ -113,15 +100,9 @@ function getUsdcPerUnderlyingAfterOracleOne(
 
     let usdcPerUnderlying: BigDecimal;
 
-    if (
-        blockNumber.lt(
-            GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER
-        )
-    ) {
+    if (blockNumber.lt(GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER)) {
         // Before this block number, getUnderlyingPrice uses an eth base
-        const ethPerUnderlingScaled = oracle.try_getUnderlyingPrice(
-            cTokenAddress
-        );
+        const ethPerUnderlingScaled = oracle.try_getUnderlyingPrice(cTokenAddress);
 
         if (ethPerUnderlingScaled.reverted) {
             // Expect to get this when we ask for COMP price, but COMP doesn't exist yet
@@ -142,9 +123,7 @@ function getUsdcPerUnderlyingAfterOracleOne(
     } else {
         // After this block number, getUnderlyingPrice uses usdc as base
 
-        const usdcPerUnderlyingScaled = oracle.try_getUnderlyingPrice(
-            cTokenAddress
-        );
+        const usdcPerUnderlyingScaled = oracle.try_getUnderlyingPrice(cTokenAddress);
 
         if (usdcPerUnderlyingScaled.reverted) {
             log.warning(
@@ -168,9 +147,7 @@ function getUsdcPerEthFromOracleOne(): BigDecimal {
     const oracle = PriceOracle1.bind(oracleAddress);
 
     // getPrice has a base of eth
-    const ethPerUsdcScaled = oracle.try_getPrice(
-        Address.fromString(USDC_ADDRESS)
-    );
+    const ethPerUsdcScaled = oracle.try_getPrice(Address.fromString(USDC_ADDRESS));
 
     if (ethPerUsdcScaled.reverted) {
         log.warning("*** ERROR: getUsdcPerEthFromOracleOne failed", []);
@@ -178,14 +155,9 @@ function getUsdcPerEthFromOracleOne(): BigDecimal {
     }
 
     // Scaled by 10^18 when stored
-    const ethPerUsdc = tokenAmountToDecimal(
-        ethPerUsdcScaled.value,
-        BigInt.fromU32(18)
-    );
+    const ethPerUsdc = tokenAmountToDecimal(ethPerUsdcScaled.value, BigInt.fromU32(18));
 
-    const usdcPerEth = ethPerUsdc.notEqual(ZERO_BD)
-        ? ONE_BD.div(ethPerUsdc)
-        : ZERO_BD;
+    const usdcPerEth = ethPerUsdc.notEqual(ZERO_BD) ? ONE_BD.div(ethPerUsdc) : ZERO_BD;
 
     return usdcPerEth;
 }
@@ -202,52 +174,30 @@ function getUsdcPerEthAfterOracleOne(blockNumber: BigInt): BigDecimal {
 
     let usdcPerEth: BigDecimal;
 
-    if (
-        blockNumber.lt(
-            GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER
-        )
-    ) {
+    if (blockNumber.lt(GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER)) {
         // Before this block number, getUnderlyingPrice uses an eth base
-        const ethPerUsdcScaled = oracle.try_getUnderlyingPrice(
-            Address.fromString(CUSDC_ADDRESS)
-        );
+        const ethPerUsdcScaled = oracle.try_getUnderlyingPrice(Address.fromString(CUSDC_ADDRESS));
 
         if (ethPerUsdcScaled.reverted) {
-            log.warning(
-                "*** ERROR: getUsdcPerEthAfterOracleOne failed with eth base",
-                []
-            );
+            log.warning("*** ERROR: getUsdcPerEthAfterOracleOne failed with eth base", []);
             return ZERO_BD;
         }
 
         // Unsclaing the value, this is 18 for the scale, 18 for eth decimals, 6 for usdc decimals
-        const ethPerUsdc = tokenAmountToDecimal(
-            ethPerUsdcScaled.value,
-            BigInt.fromU32(18 - 6 + 18)
-        );
+        const ethPerUsdc = tokenAmountToDecimal(ethPerUsdcScaled.value, BigInt.fromU32(18 - 6 + 18));
 
-        usdcPerEth = ethPerUsdc.notEqual(ZERO_BD)
-            ? ONE_BD.div(ethPerUsdc)
-            : ZERO_BD;
+        usdcPerEth = ethPerUsdc.notEqual(ZERO_BD) ? ONE_BD.div(ethPerUsdc) : ZERO_BD;
     } else {
         // After this block number, getUnderlyingPrice uses usdc as base
 
-        const usdcPerEthScaled = oracle.try_getUnderlyingPrice(
-            Address.fromString(CETH_ADDRESS)
-        );
+        const usdcPerEthScaled = oracle.try_getUnderlyingPrice(Address.fromString(CETH_ADDRESS));
 
         if (usdcPerEthScaled.reverted) {
-            log.warning(
-                "*** ERROR: getUsdcPerEthAfterOracleOne failed with usdc base",
-                []
-            );
+            log.warning("*** ERROR: getUsdcPerEthAfterOracleOne failed with usdc base", []);
             return ZERO_BD;
         }
 
-        usdcPerEth = tokenAmountToDecimal(
-            usdcPerEthScaled.value,
-            BigInt.fromU32(18)
-        );
+        usdcPerEth = tokenAmountToDecimal(usdcPerEthScaled.value, BigInt.fromU32(18));
     }
 
     return usdcPerEth;

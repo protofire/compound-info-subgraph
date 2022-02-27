@@ -10,10 +10,7 @@ import { PROTOCOL_ID, ZERO_BD } from "../utils/constants";
  * @param blockNumber block number when this was created
  * @returns a new Market object
  */
-export function createProtocol(
-    priceOracleAddress: Address,
-    blockNumber: BigInt
-): Protocol {
+export function createProtocol(priceOracleAddress: Address, blockNumber: BigInt): Protocol {
     let protocol = new Protocol(PROTOCOL_ID);
 
     protocol.priceOracle = priceOracleAddress;
@@ -37,10 +34,7 @@ export function updateProtocolSummaryData(blockNumber: BigInt): void {
     let protocol = Protocol.load(PROTOCOL_ID);
 
     if (protocol == null) {
-        log.warning(
-            "*** ERROR: protocol was null in updateProtocolSummaryData()",
-            []
-        );
+        log.warning("*** ERROR: protocol was null in updateProtocolSummaryData()", []);
         return;
     }
 
@@ -59,22 +53,15 @@ export function updateProtocolSummaryData(blockNumber: BigInt): void {
 
         if (market != null) {
             totalSupplyUsd = totalSupplyUsd.plus(market.totalSupplyUsd);
-
             totalBorrowUsd = totalBorrowUsd.plus(market.totalBorrowUsd);
-
             totalReservesUsd = totalReservesUsd.plus(market.totalReservesUsd);
         } else {
             // Won't happen
-            log.warning(
-                "*** ERROR: a market was null in the loop of updateProtocolSummaryData()",
-                []
-            );
+            log.warning("*** ERROR: a market was null in the loop of updateProtocolSummaryData()", []);
         }
     }
 
-    let utilization = totalSupplyUsd.equals(ZERO_BD)
-        ? ZERO_BD
-        : totalBorrowUsd.div(totalSupplyUsd);
+    let utilization = totalSupplyUsd.equals(ZERO_BD) ? ZERO_BD : totalBorrowUsd.div(totalSupplyUsd);
 
     protocol.totalSupplyUsd = totalSupplyUsd;
     protocol.totalBorrowUsd = totalBorrowUsd;

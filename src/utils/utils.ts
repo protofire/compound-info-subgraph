@@ -59,3 +59,19 @@ export function calculateCompDistrubtionApy(
     }
     return apy.minus(ONE_BD);
 }
+
+export function minBigDecimal(a: BigDecimal, b: BigDecimal): BigDecimal {
+    if (a.lt(b)) {
+        return a;
+    } else {
+        return b;
+    }
+}
+
+export function maxBigDecimal(a: BigDecimal, b: BigDecimal): BigDecimal {
+    if (a.gt(b)) {
+        return a;
+    } else {
+        return b;
+    }
+}
