@@ -7,9 +7,9 @@ import { tokenAmountToDecimal } from "../utils/utils";
 import { createUser } from "./user";
 
 export function createUserMarket(userAddress: Address, marketAddress: Address, blockNumber: BigInt): UserMarket {
-    const userId = userAddress.toHexString();
-    const marketId = marketAddress.toHexString();
-    const userMarketId = userId + marketId;
+    const userId = userAddress;
+    const marketId = marketAddress;
+    const userMarketId = userId.toHexString() + marketId.toHexString();
 
     let user = User.load(userId);
     if (user == null) {
@@ -41,9 +41,9 @@ export function createUserMarket(userAddress: Address, marketAddress: Address, b
 }
 
 export function updateUserMarketBalance(userAddress: Address, marketAddress: Address, blockNumber: BigInt): void {
-    const userId = userAddress.toHexString();
-    const marketId = marketAddress.toHexString();
-    const userMarketId = userId + marketId;
+    const userId = userAddress;
+    const marketId = marketAddress;
+    const userMarketId = userId.toHexString() + marketId.toHexString();
 
     const market = Market.load(marketId);
     let user = User.load(userId);

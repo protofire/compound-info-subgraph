@@ -30,7 +30,7 @@ export function createMarket(marketAddress: Address, blockNumber: BigInt): Marke
     log.info(`CREATING MARKET: ${marketAddress.toHexString()}`, []);
 
     const contract = CToken.bind(marketAddress);
-    const market = new Market(marketAddress.toHexString());
+    const market = new Market(marketAddress);
     market.creationBlockNumber = blockNumber;
     market.latestBlockNumber = blockNumber;
     market.cTokenSymbol = contract.symbol();
@@ -105,7 +105,7 @@ export function createMarket(marketAddress: Address, blockNumber: BigInt): Marke
  * @param blockNumber block number that this function is being called
  */
 export function updateMarket(marketAddress: Address, blockNumber: BigInt): void {
-    let market = Market.load(marketAddress.toHexString());
+    let market = Market.load(marketAddress);
 
     if (market == null) {
         log.warning("*** ERROR: market was null in updateMarket()", []);
@@ -116,7 +116,7 @@ export function updateMarket(marketAddress: Address, blockNumber: BigInt): void 
 
     // Only update if it hasn't been updated on this block yet
     if (market.latestBlockNumber != blockNumber) {
-        let contractAddress = Address.fromString(market.id);
+        let contractAddress = changetype<Address>(market.id);
         let contract = CToken.bind(contractAddress);
 
         market.latestBlockNumber = contract.accrualBlockNumber();
@@ -126,7 +126,7 @@ export function updateMarket(marketAddress: Address, blockNumber: BigInt): void 
 
         market.usdcPerUnderlying = getUsdcPerUnderlying(
             changetype<Address>(market.underlyingAddress),
-            Address.fromString(market.id),
+            changetype<Address>(market.id),
             market.underlyingDecimals,
             blockNumber,
             market.usdcPerEth
