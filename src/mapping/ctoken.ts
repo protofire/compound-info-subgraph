@@ -1,10 +1,4 @@
-import {
-    Address,
-    BigInt,
-    BigDecimal,
-    log,
-    bigDecimal,
-} from "@graphprotocol/graph-ts";
+import { Address, BigInt, BigDecimal, log, bigDecimal } from "@graphprotocol/graph-ts";
 import {
     Approval as ApprovalEvent,
     Mint as MintEvent,
@@ -39,10 +33,7 @@ import {
     updateMarketWeekData,
     updateProtocolWeekData,
 } from "../mapping-helpers/historical-data";
-import {
-    createUserMarket,
-    updateUserMarketBalance,
-} from "../mapping-helpers/userMarket";
+import { createUserMarket, updateUserMarketBalance } from "../mapping-helpers/userMarket";
 import { maxBigDecimal, tokenAmountToDecimal } from "../utils/utils";
 import {
     GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER,
@@ -103,20 +94,13 @@ export function handleMint(event: MintEvent): void {
     updateUserAggregates(userAddress);
 
     // Create mint event
-    const userMarketId =
-        userAddress.toHexString() + marketAddress.toHexString();
-    const mint = new Mint(event.transaction.hash.toHexString());
+    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const mint = new Mint(event.transaction.hash);
     mint.blockNumber = blockNumber;
     mint.date = event.block.timestamp;
     mint.userMarket = userMarketId;
-    mint.underlyingAmount = tokenAmountToDecimal(
-        event.params.mintAmount,
-        market.underlyingDecimals
-    );
-    mint.cTokenAmount = tokenAmountToDecimal(
-        event.params.mintTokens,
-        market.cTokenDecimals
-    );
+    mint.underlyingAmount = tokenAmountToDecimal(event.params.mintAmount, market.underlyingDecimals);
+    mint.cTokenAmount = tokenAmountToDecimal(event.params.mintTokens, market.cTokenDecimals);
 
     mint.save();
 }
@@ -145,20 +129,13 @@ export function handleRedeem(event: RedeemEvent): void {
     updateUserAggregates(userAddress);
 
     // Create redeem event
-    const userMarketId =
-        userAddress.toHexString() + marketAddress.toHexString();
-    const redeem = new Redeem(event.transaction.hash.toHexString());
+    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const redeem = new Redeem(event.transaction.hash);
     redeem.blockNumber = blockNumber;
     redeem.date = event.block.timestamp;
     redeem.userMarket = userMarketId;
-    redeem.underlyingAmount = tokenAmountToDecimal(
-        event.params.redeemAmount,
-        market.underlyingDecimals
-    );
-    redeem.cTokenAmount = tokenAmountToDecimal(
-        event.params.redeemTokens,
-        market.cTokenDecimals
-    );
+    redeem.underlyingAmount = tokenAmountToDecimal(event.params.redeemAmount, market.underlyingDecimals);
+    redeem.cTokenAmount = tokenAmountToDecimal(event.params.redeemTokens, market.cTokenDecimals);
 
     redeem.save();
 }
@@ -186,16 +163,12 @@ export function handleBorrow(event: BorrowEvent): void {
     updateUserAggregates(userAddress);
 
     // Create borrow event
-    const userMarketId =
-        userAddress.toHexString() + marketAddress.toHexString();
-    const borrow = new Borrow(event.transaction.hash.toHexString());
+    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const borrow = new Borrow(event.transaction.hash);
     borrow.blockNumber = blockNumber;
     borrow.date = event.block.timestamp;
     borrow.userMarket = userMarketId;
-    borrow.underlyingAmount = tokenAmountToDecimal(
-        event.params.borrowAmount,
-        market.underlyingDecimals
-    );
+    borrow.underlyingAmount = tokenAmountToDecimal(event.params.borrowAmount, market.underlyingDecimals);
 
     borrow.save();
 }
@@ -223,16 +196,12 @@ export function handleRepayBorrow(event: RepayBorrowEvent): void {
     updateUserAggregates(userAddress);
 
     // Create repay borrow event
-    const userMarketId =
-        userAddress.toHexString() + marketAddress.toHexString();
-    const repayBorrow = new RepayBorrow(event.transaction.hash.toHexString());
+    const userMarketId = userAddress.toHexString() + marketAddress.toHexString();
+    const repayBorrow = new RepayBorrow(event.transaction.hash);
     repayBorrow.blockNumber = event.block.number;
     repayBorrow.date = event.block.timestamp;
     repayBorrow.userMarket = userMarketId;
-    repayBorrow.underlyingAmount = tokenAmountToDecimal(
-        event.params.repayAmount,
-        market.underlyingDecimals
-    );
+    repayBorrow.underlyingAmount = tokenAmountToDecimal(event.params.repayAmount, market.underlyingDecimals);
 
     repayBorrow.save();
 }
@@ -252,26 +221,17 @@ export function handleLiquidateBorrow(event: LiquidateBorrowEvent): void {
     const blockNumber = event.block.number;
 
     const seizeMarket = Market.load(seizeMarketAddress.toHexString());
-    const liquidationMarket = Market.load(
-        liquidationMarketAddress.toHexString()
-    );
+    const liquidationMarket = Market.load(liquidationMarketAddress.toHexString());
 
     if (liquidationMarket == null || seizeMarket == null) {
         // Won't happen
-        log.warning(
-            "*** ERROR: liquidationMarket or seizeMarket was null in handleLiquidateBorrow()",
-            []
-        );
+        log.warning("*** ERROR: liquidationMarket or seizeMarket was null in handleLiquidateBorrow()", []);
         return;
     }
 
     // these also create the user and userMarket if they don't exist
     // Borrower got liquidated, the totalBorrow for this userMarket will decreace.
-    updateUserMarketBalance(
-        borrowerAddress,
-        liquidationMarketAddress,
-        blockNumber
-    );
+    updateUserMarketBalance(borrowerAddress, liquidationMarketAddress, blockNumber);
     // Borrower got seized, the cTokenBalance for this userMarket will decrease
     updateUserMarketBalance(borrowerAddress, seizeMarketAddress, blockNumber);
     // Liquidator got the seized cTokens, the cTokenBalance for this userMarket will increase
@@ -282,26 +242,17 @@ export function handleLiquidateBorrow(event: LiquidateBorrowEvent): void {
     updateUserAggregates(liquidatorAddress);
 
     // Create liquidation event
-    const borrowerUserLiquidationMarketId =
-        borrowerAddress.toHexString() + liquidationMarketAddress.toHexString();
-    const borrowerUserSeizeMarketId =
-        borrowerAddress.toHexString() + seizeMarketAddress.toHexString();
-    const liquidatorUserMarketId =
-        liquidatorAddress.toHexString() + seizeMarketAddress.toHexString();
-    const liquidation = new Liquidation(event.transaction.hash.toHexString());
+    const borrowerUserLiquidationMarketId = borrowerAddress.toHexString() + liquidationMarketAddress.toHexString();
+    const borrowerUserSeizeMarketId = borrowerAddress.toHexString() + seizeMarketAddress.toHexString();
+    const liquidatorUserMarketId = liquidatorAddress.toHexString() + seizeMarketAddress.toHexString();
+    const liquidation = new Liquidation(event.transaction.hash);
     liquidation.blockNumber = blockNumber;
     liquidation.date = event.block.timestamp;
     liquidation.borrowerUserLiquidationMarket = borrowerUserLiquidationMarketId;
     liquidation.borrowerUserSeizeMarket = borrowerUserSeizeMarketId;
     liquidation.liquidatorUserMarket = liquidatorUserMarketId;
-    liquidation.repayAmount = tokenAmountToDecimal(
-        event.params.repayAmount,
-        liquidationMarket.underlyingDecimals
-    );
-    liquidation.seizeAmount = tokenAmountToDecimal(
-        event.params.seizeTokens,
-        seizeMarket.cTokenDecimals
-    );
+    liquidation.repayAmount = tokenAmountToDecimal(event.params.repayAmount, liquidationMarket.underlyingDecimals);
+    liquidation.seizeAmount = tokenAmountToDecimal(event.params.seizeTokens, seizeMarket.cTokenDecimals);
 
     liquidation.save();
 }
@@ -344,19 +295,14 @@ export function handleTransfer(event: TransferEvent): void {
     updateUserAggregates(toAddress);
 
     // Create transfer event
-    const fromUserMarketId =
-        fromAddress.toHexString() + marketAddress.toHexString();
-    const toUserMarketId =
-        toAddress.toHexString() + marketAddress.toHexString();
-    const transfer = new Transfer(event.transaction.hash.toHexString());
+    const fromUserMarketId = fromAddress.toHexString() + marketAddress.toHexString();
+    const toUserMarketId = toAddress.toHexString() + marketAddress.toHexString();
+    const transfer = new Transfer(event.transaction.hash);
     transfer.blockNumber = blockNumber;
     transfer.date = event.block.timestamp;
     transfer.fromUserMarket = fromUserMarketId;
     transfer.toUserMarket = toUserMarketId;
-    transfer.cTokenAmount = tokenAmountToDecimal(
-        event.params.amount,
-        market.cTokenDecimals
-    );
+    transfer.cTokenAmount = tokenAmountToDecimal(event.params.amount, market.cTokenDecimals);
 
     transfer.save();
 

@@ -50,6 +50,7 @@ type Market @entity {
     numberOfBorrowers: BigInt!
     "list of all UserMarket positions that belong to this market"
     userMarkets: [UserMarket!]! @derivedFrom(field: "market")
+
     "collator factor in decimal form"
     collateralFactor: BigDecimal!
     "reserve factor in decimal form"
@@ -116,6 +117,21 @@ type MarketHourData @entity {
     market: Market!
     "unix timestamp in seconds rounded to the start of the hour"
     date: BigInt!
+
+    "collator factor in decimal form"
+    collateralFactor: BigDecimal!
+    "reserve factor in decimal form"
+    reserveFactor: BigDecimal!
+    "borrow cap in underlying tokens"
+    borrowCap: BigDecimal!
+    "amount of underlying owned by the contract"
+    cash: BigDecimal!
+    "number of underlying one cToken is worth (exchange_rate)"
+    underlyingPerCToken: BigDecimal!
+    "supply rate per block, this is the value from the contract with the 10^18 scaling removed"
+    supplyRatePerBlock: BigDecimal!
+    "borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
+    borrowRatePerBlock: BigDecimal!
     "supply apy not including the COMP distribution in decimal form"
     supplyApy: BigDecimal!
     "borrow apy not including the COMP distribution in decimal form"
@@ -124,25 +140,33 @@ type MarketHourData @entity {
     totalSupplyApy: BigDecimal!
     "total borrow apy including the COMP distribution in decimal form"
     totalBorrowApy: BigDecimal!
-    "total amount of underlying tokens supplied over time"
+    "total amount of underlying tokens supplied"
     totalSupply: BigDecimal!
     "total amount supplied in USD"
     totalSupplyUsd: BigDecimal!
-    "total amount of underlying tokens borrowed over time"
+    "total amount of underlying tokens borrowed"
     totalBorrow: BigDecimal!
     "total amount borrowed in USD"
     totalBorrowUsd: BigDecimal!
-    "total amount of underlying token in reserves over time"
+    "total amount of underlying token in reserves"
     totalReserves: BigDecimal!
-    "total amount in reseres in USD"
+    "total amount in reserves in USD"
     totalReservesUsd: BigDecimal!
+    "total available to be borrowed in the underlying asset"
+    availableLiquidity: BigDecimal!
+    "total available to be borrowed in USD"
+    availableLiquidityUsd: BigDecimal!
     "utilization"
     utilization: BigDecimal!
-    "price of the underlying token in USDC"
+    "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
+    compSpeedSupply: BigDecimal!
+    "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
+    compSpeedBorrow: BigDecimal!
+    "number of usdc one underlying token is worth"
     usdcPerUnderlying: BigDecimal!
     "number of usdc one eth is worth"
     usdcPerEth: BigDecimal!
-    "price of COMP token in USDC"
+    "number of usdc one comp is worth"
     usdcPerComp: BigDecimal!
 
     "number of transactions that went into deriving this data entry"
@@ -156,6 +180,21 @@ type MarketDayData @entity {
     market: Market!
     "unix timestamp in seconds rounded to the start of the day"
     date: BigInt!
+
+    "collator factor in decimal form"
+    collateralFactor: BigDecimal!
+    "reserve factor in decimal form"
+    reserveFactor: BigDecimal!
+    "borrow cap in underlying tokens"
+    borrowCap: BigDecimal!
+    "amount of underlying owned by the contract"
+    cash: BigDecimal!
+    "number of underlying one cToken is worth (exchange_rate)"
+    underlyingPerCToken: BigDecimal!
+    "supply rate per block, this is the value from the contract with the 10^18 scaling removed"
+    supplyRatePerBlock: BigDecimal!
+    "borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
+    borrowRatePerBlock: BigDecimal!
     "supply apy not including the COMP distribution in decimal form"
     supplyApy: BigDecimal!
     "borrow apy not including the COMP distribution in decimal form"
@@ -164,26 +203,35 @@ type MarketDayData @entity {
     totalSupplyApy: BigDecimal!
     "total borrow apy including the COMP distribution in decimal form"
     totalBorrowApy: BigDecimal!
-    "total amount of underlying tokens supplied over time"
+    "total amount of underlying tokens supplied"
     totalSupply: BigDecimal!
     "total amount supplied in USD"
     totalSupplyUsd: BigDecimal!
-    "total amount of underlying tokens borrowed over time"
+    "total amount of underlying tokens borrowed"
     totalBorrow: BigDecimal!
     "total amount borrowed in USD"
     totalBorrowUsd: BigDecimal!
-    "total amount of underlying token in reserves over time"
+    "total amount of underlying token in reserves"
     totalReserves: BigDecimal!
-    "total amount in reseres in USD"
+    "total amount in reserves in USD"
     totalReservesUsd: BigDecimal!
+    "total available to be borrowed in the underlying asset"
+    availableLiquidity: BigDecimal!
+    "total available to be borrowed in USD"
+    availableLiquidityUsd: BigDecimal!
     "utilization"
     utilization: BigDecimal!
-    "price of the underlying token in USDC"
+    "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
+    compSpeedSupply: BigDecimal!
+    "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
+    compSpeedBorrow: BigDecimal!
+    "number of usdc one underlying token is worth"
     usdcPerUnderlying: BigDecimal!
     "number of usdc one eth is worth"
     usdcPerEth: BigDecimal!
-    "price of COMP token in USDC"
+    "number of usdc one comp is worth"
     usdcPerComp: BigDecimal!
+
     "number of transactions that went into deriving this data entry"
     txCount: BigInt!
 }
@@ -195,6 +243,21 @@ type MarketWeekData @entity {
     market: Market!
     "unix timestamp in seconds rounded to the start of the week"
     date: BigInt!
+
+    "collator factor in decimal form"
+    collateralFactor: BigDecimal!
+    "reserve factor in decimal form"
+    reserveFactor: BigDecimal!
+    "borrow cap in underlying tokens"
+    borrowCap: BigDecimal!
+    "amount of underlying owned by the contract"
+    cash: BigDecimal!
+    "number of underlying one cToken is worth (exchange_rate)"
+    underlyingPerCToken: BigDecimal!
+    "supply rate per block, this is the value from the contract with the 10^18 scaling removed"
+    supplyRatePerBlock: BigDecimal!
+    "borrow rate per block, this is the value from the contract with the 10^18 scaling removed"
+    borrowRatePerBlock: BigDecimal!
     "supply apy not including the COMP distribution in decimal form"
     supplyApy: BigDecimal!
     "borrow apy not including the COMP distribution in decimal form"
@@ -203,26 +266,35 @@ type MarketWeekData @entity {
     totalSupplyApy: BigDecimal!
     "total borrow apy including the COMP distribution in decimal form"
     totalBorrowApy: BigDecimal!
-    "total amount of underlying tokens supplied over time"
+    "total amount of underlying tokens supplied"
     totalSupply: BigDecimal!
     "total amount supplied in USD"
     totalSupplyUsd: BigDecimal!
-    "total amount of underlying tokens borrowed over time"
+    "total amount of underlying tokens borrowed"
     totalBorrow: BigDecimal!
     "total amount borrowed in USD"
     totalBorrowUsd: BigDecimal!
-    "total amount of underlying token in reserves over time"
+    "total amount of underlying token in reserves"
     totalReserves: BigDecimal!
-    "total amount in reseres in USD"
+    "total amount in reserves in USD"
     totalReservesUsd: BigDecimal!
+    "total available to be borrowed in the underlying asset"
+    availableLiquidity: BigDecimal!
+    "total available to be borrowed in USD"
+    availableLiquidityUsd: BigDecimal!
     "utilization"
     utilization: BigDecimal!
-    "price of the underlying token in USDC"
+    "COMP distribution per block for suppliers, this is the value from the contract with the 10^18 scaling removed"
+    compSpeedSupply: BigDecimal!
+    "COMP distribution per block for borrowers, this is the value from the contract with the 10^18 scaling removed"
+    compSpeedBorrow: BigDecimal!
+    "number of usdc one underlying token is worth"
     usdcPerUnderlying: BigDecimal!
     "number of usdc one eth is worth"
     usdcPerEth: BigDecimal!
-    "price of COMP token in USDC"
+    "number of usdc one comp is worth"
     usdcPerComp: BigDecimal!
+
     "number of transactions that went into deriving this data entry"
     txCount: BigInt!
 }
@@ -248,7 +320,7 @@ type ProtocolWeekData @entity {
 
 type User @entity {
     "users wallet address"
-    id: ID!
+    id: Bytes!
     "block number the user was created"
     creationBlockNumber: BigInt!
     "most recent block number where the user was updated"
@@ -307,9 +379,9 @@ type UserMarket @entity {
 }
 
 # mint: underlying <-> ctoken
-type Mint @entity {
+type Mint @entity(immutable: true) {
     "transaction hash"
-    id: ID!
+    id: Bytes!
     "block number the transation occured"
     blockNumber: BigInt!
     "unix timestamp in seconds the transaction was made"
@@ -323,9 +395,9 @@ type Mint @entity {
 }
 
 # redeem: cToken <-> underlying
-type Redeem @entity {
+type Redeem @entity(immutable: true) {
     "transaction hash"
-    id: ID!
+    id: Bytes!
     "block number the transation occured"
     blockNumber: BigInt!
     "unix timestamp in seconds the transaction was made"
@@ -339,9 +411,9 @@ type Redeem @entity {
 }
 
 # borrow: underlying
-type Borrow @entity {
+type Borrow @entity(immutable: true) {
     "transaction hash"
-    id: ID!
+    id: Bytes!
     "block number the transation occured"
     blockNumber: BigInt!
     "unix timestamp in seconds the transaction was made"
@@ -353,9 +425,9 @@ type Borrow @entity {
 }
 
 # repay: underlying
-type RepayBorrow @entity {
+type RepayBorrow @entity(immutable: true) {
     "transaction hash"
-    id: ID!
+    id: Bytes!
     "block number the transation occured"
     blockNumber: BigInt!
     "unix timestamp in seconds the transaction was made"
@@ -367,9 +439,9 @@ type RepayBorrow @entity {
 }
 
 # transfer: cToken
-type Transfer @entity {
+type Transfer @entity(immutable: true) {
     "transaction hash"
-    id: ID!
+    id: Bytes!
     "block number the transation occured"
     blockNumber: BigInt!
     "unix timestamp in seconds the transaction was made"
@@ -383,9 +455,9 @@ type Transfer @entity {
 }
 
 # liquidation: underlying token from borrowerMarket's market <-> cTokens of liquidatorMarket's market
-type Liquidation @entity {
+type Liquidation @entity(immutable: true) {
     "transaction hash"
-    id: ID!
+    id: Bytes!
     "block number of the liquidation"
     blockNumber: BigInt!
     "unix timestamp in seconds the liqudation was made"

@@ -7,11 +7,10 @@ import { tokenAmountToDecimal } from "../utils/utils";
 import { createUser } from "./user";
 
 export function createUserMarket(userAddress: Address, marketAddress: Address, blockNumber: BigInt): UserMarket {
-    const userId = userAddress.toHexString();
     const marketId = marketAddress.toHexString();
-    const userMarketId = userId + marketId;
+    const userMarketId = userAddress.toHexString() + marketId;
 
-    let user = User.load(userId);
+    let user = User.load(userAddress);
     if (user == null) {
         // Should never happen
         log.warning("*** ERROR: create user market was called with a non existant user", []);
@@ -21,7 +20,7 @@ export function createUserMarket(userAddress: Address, marketAddress: Address, b
 
     const userMarket = new UserMarket(userMarketId);
 
-    userMarket.user = userId;
+    userMarket.user = userAddress;
     userMarket.market = marketId;
     userMarket.creationBlockNumber = blockNumber;
     userMarket.latestBlockNumber = blockNumber;
@@ -41,12 +40,11 @@ export function createUserMarket(userAddress: Address, marketAddress: Address, b
 }
 
 export function updateUserMarketBalance(userAddress: Address, marketAddress: Address, blockNumber: BigInt): void {
-    const userId = userAddress.toHexString();
     const marketId = marketAddress.toHexString();
-    const userMarketId = userId + marketId;
+    const userMarketId = userAddress.toHexString() + marketId;
 
     const market = Market.load(marketId);
-    let user = User.load(userId);
+    let user = User.load(userAddress);
     let userMarket = UserMarket.load(userMarketId);
 
     if (market == null) {

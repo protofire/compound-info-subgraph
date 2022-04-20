@@ -1,6 +1,6 @@
 # [Compound Info Subgraph](https://thegraph.com/hosted-service/subgraph/papercliplabs/compound-info)
 
-This is the data source for [Compound Info](https://compoundfinance.info) 
+This is the data source for [Compound Info](https://compoundfinance.info)
 
 ###### Installing dependencies
 
@@ -9,13 +9,13 @@ yarn global add @graphprotocol/graph-cli
 yarn
 ```
 
-###### Run codegen 
+###### Run codegen
 
 ```bash
 graph codegen
 ```
 
-###### Deploy changes 
+###### Deploy changes
 
 ```bash
 graph deploy --product hosted-service papercliplabs/compound-info --deploy-key <DEPLOY_KEY>

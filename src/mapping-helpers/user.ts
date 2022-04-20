@@ -4,7 +4,7 @@ import { User, UserMarket } from "../../generated/schema";
 import { ZERO_BD } from "../utils/constants";
 
 export function createUser(address: Address, blockNumber: BigInt): User {
-    const user = new User(address.toHexString());
+    const user = new User(address);
 
     user.creationBlockNumber = blockNumber;
     user.lastBlockNumber = blockNumber;
@@ -14,8 +14,7 @@ export function createUser(address: Address, blockNumber: BigInt): User {
 }
 
 export function updateUserAggregates(userAddress: Address): void {
-    const userId = userAddress.toHexString();
-    const user = User.load(userId);
+    const user = User.load(userAddress);
 
     if (user == null) {
         // Should never happen

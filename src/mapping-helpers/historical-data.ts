@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ethereum, log } from "@graphprotocol/graph-ts";
+import { BigDecimal, BigInt, Bytes, ethereum, log } from "@graphprotocol/graph-ts";
 
 import {
     Market,
@@ -34,6 +34,14 @@ export function updateMarketHourData(event: ethereum.Event): void {
         marketData.date = hourStartTimestamp;
 
         // Set defaults
+        marketData.collateralFactor = ZERO_BD;
+        marketData.reserveFactor = ZERO_BD;
+        marketData.borrowCap = ZERO_BD;
+        marketData.cash = ZERO_BD;
+        marketData.underlyingPerCToken = ZERO_BD;
+        marketData.supplyRatePerBlock = ZERO_BD;
+        marketData.borrowRatePerBlock = ZERO_BD;
+
         marketData.supplyApy = ZERO_BD;
         marketData.borrowApy = ZERO_BD;
         marketData.totalSupplyApy = ZERO_BD;
@@ -47,6 +55,7 @@ export function updateMarketHourData(event: ethereum.Event): void {
         marketData.utilization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
+
         marketData.txCount = ZERO_BI;
     }
 
@@ -55,6 +64,30 @@ export function updateMarketHourData(event: ethereum.Event): void {
     const newValueWeigth = BigDecimal.fromString("1").div(txCount.plus(ONE_BD));
 
     // Compute averages: newValue = (oldValue*txCount + newValue) / (txCount + 1)
+    marketData.collateralFactor = marketData.collateralFactor
+        .times(oldValueWeight)
+        .plus(market.collateralFactor.times(newValueWeigth));
+
+    marketData.reserveFactor = marketData.reserveFactor
+        .times(oldValueWeight)
+        .plus(market.reserveFactor.times(newValueWeigth));
+
+    marketData.borrowCap = marketData.borrowCap.times(oldValueWeight).plus(market.borrowCap.times(newValueWeigth));
+
+    marketData.cash = marketData.cash.times(oldValueWeight).plus(market.cash.times(newValueWeigth));
+
+    marketData.underlyingPerCToken = marketData.underlyingPerCToken
+        .times(oldValueWeight)
+        .plus(market.underlyingPerCToken.times(newValueWeigth));
+
+    marketData.supplyRatePerBlock = marketData.supplyRatePerBlock
+        .times(oldValueWeight)
+        .plus(market.supplyRatePerBlock.times(newValueWeigth));
+
+    marketData.borrowRatePerBlock = marketData.borrowRatePerBlock
+        .times(oldValueWeight)
+        .plus(market.borrowRatePerBlock.times(newValueWeigth));
+
     marketData.supplyApy = marketData.supplyApy.times(oldValueWeight).plus(market.supplyApy.times(newValueWeigth));
 
     marketData.borrowApy = marketData.borrowApy.times(oldValueWeight).plus(market.borrowApy.times(newValueWeigth));
@@ -138,6 +171,13 @@ export function updateMarketDayData(event: ethereum.Event): void {
         marketData.date = dayStartTimestamp;
 
         // Set defaults
+        marketData.collateralFactor = ZERO_BD;
+        marketData.reserveFactor = ZERO_BD;
+        marketData.borrowCap = ZERO_BD;
+        marketData.cash = ZERO_BD;
+        marketData.underlyingPerCToken = ZERO_BD;
+        marketData.supplyRatePerBlock = ZERO_BD;
+        marketData.borrowRatePerBlock = ZERO_BD;
         marketData.supplyApy = ZERO_BD;
         marketData.borrowApy = ZERO_BD;
         marketData.totalSupplyApy = ZERO_BD;
@@ -151,6 +191,7 @@ export function updateMarketDayData(event: ethereum.Event): void {
         marketData.utilization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
+
         marketData.txCount = ZERO_BI;
     }
 
@@ -159,6 +200,30 @@ export function updateMarketDayData(event: ethereum.Event): void {
     const newValueWeigth = BigDecimal.fromString("1").div(txCount.plus(ONE_BD));
 
     // Compute averages: newValue = (oldValue*txCount + newValue) / (txCount + 1)
+    marketData.collateralFactor = marketData.collateralFactor
+        .times(oldValueWeight)
+        .plus(market.collateralFactor.times(newValueWeigth));
+
+    marketData.reserveFactor = marketData.reserveFactor
+        .times(oldValueWeight)
+        .plus(market.reserveFactor.times(newValueWeigth));
+
+    marketData.borrowCap = marketData.borrowCap.times(oldValueWeight).plus(market.borrowCap.times(newValueWeigth));
+
+    marketData.cash = marketData.cash.times(oldValueWeight).plus(market.cash.times(newValueWeigth));
+
+    marketData.underlyingPerCToken = marketData.underlyingPerCToken
+        .times(oldValueWeight)
+        .plus(market.underlyingPerCToken.times(newValueWeigth));
+
+    marketData.supplyRatePerBlock = marketData.supplyRatePerBlock
+        .times(oldValueWeight)
+        .plus(market.supplyRatePerBlock.times(newValueWeigth));
+
+    marketData.borrowRatePerBlock = marketData.borrowRatePerBlock
+        .times(oldValueWeight)
+        .plus(market.borrowRatePerBlock.times(newValueWeigth));
+
     marketData.supplyApy = marketData.supplyApy.times(oldValueWeight).plus(market.supplyApy.times(newValueWeigth));
 
     marketData.borrowApy = marketData.borrowApy.times(oldValueWeight).plus(market.borrowApy.times(newValueWeigth));
@@ -237,6 +302,13 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         marketData.date = weekStartTimestamp;
 
         // Set defaults
+        marketData.collateralFactor = ZERO_BD;
+        marketData.reserveFactor = ZERO_BD;
+        marketData.borrowCap = ZERO_BD;
+        marketData.cash = ZERO_BD;
+        marketData.underlyingPerCToken = ZERO_BD;
+        marketData.supplyRatePerBlock = ZERO_BD;
+        marketData.borrowRatePerBlock = ZERO_BD;
         marketData.supplyApy = ZERO_BD;
         marketData.borrowApy = ZERO_BD;
         marketData.totalSupplyApy = ZERO_BD;
@@ -250,6 +322,7 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         marketData.utilization = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
+
         marketData.txCount = ZERO_BI;
     }
 
@@ -258,6 +331,30 @@ export function updateMarketWeekData(event: ethereum.Event): void {
     const newValueWeigth = BigDecimal.fromString("1").div(txCount.plus(ONE_BD));
 
     // Compute averages: newValue = (oldValue*txCount + newValue) / (txCount + 1)
+    marketData.collateralFactor = marketData.collateralFactor
+        .times(oldValueWeight)
+        .plus(market.collateralFactor.times(newValueWeigth));
+
+    marketData.reserveFactor = marketData.reserveFactor
+        .times(oldValueWeight)
+        .plus(market.reserveFactor.times(newValueWeigth));
+
+    marketData.borrowCap = marketData.borrowCap.times(oldValueWeight).plus(market.borrowCap.times(newValueWeigth));
+
+    marketData.cash = marketData.cash.times(oldValueWeight).plus(market.cash.times(newValueWeigth));
+
+    marketData.underlyingPerCToken = marketData.underlyingPerCToken
+        .times(oldValueWeight)
+        .plus(market.underlyingPerCToken.times(newValueWeigth));
+
+    marketData.supplyRatePerBlock = marketData.supplyRatePerBlock
+        .times(oldValueWeight)
+        .plus(market.supplyRatePerBlock.times(newValueWeigth));
+
+    marketData.borrowRatePerBlock = marketData.borrowRatePerBlock
+        .times(oldValueWeight)
+        .plus(market.borrowRatePerBlock.times(newValueWeigth));
+
     marketData.supplyApy = marketData.supplyApy.times(oldValueWeight).plus(market.supplyApy.times(newValueWeigth));
 
     marketData.borrowApy = marketData.borrowApy.times(oldValueWeight).plus(market.borrowApy.times(newValueWeigth));

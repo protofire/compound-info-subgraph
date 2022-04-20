@@ -13,11 +13,7 @@ import { createMarket } from "../mapping-helpers/market";
 import { createProtocol } from "../mapping-helpers/protocol";
 import { createUser } from "../mapping-helpers/user";
 import { createUserMarket } from "../mapping-helpers/userMarket";
-import {
-    PROTOCOL_ID,
-    PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER,
-    PRICE_ORACLE_1_ADDRESS,
-} from "../utils/constants";
+import { PROTOCOL_ID, PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER, PRICE_ORACLE_1_ADDRESS } from "../utils/constants";
 
 export function handleMarketListed(event: MarketListedEvent): void {
     const cTokenAddress = event.params.cToken;
@@ -35,10 +31,7 @@ export function handleMarketListed(event: MarketListedEvent): void {
             oracleAddress = "0x6d2299c48a8dd07a872fdd0f8233924872ad1071 "; // hard coded price oracle 2 address
         }
 
-        protocol = createProtocol(
-            Address.fromString(oracleAddress),
-            blockNumber
-        );
+        protocol = createProtocol(Address.fromString(oracleAddress), blockNumber);
     }
 
     const market = createMarket(cTokenAddress, blockNumber);
@@ -75,7 +68,7 @@ export function handleMarketEntered(event: MarketEnteredEvent): void {
     const blockNumber = event.block.number;
 
     const market = Market.load(marketAddress.toHexString());
-    let user = User.load(userAddress.toHexString());
+    let user = User.load(userAddress);
 
     if (market == null) {
         // Won't happen
@@ -89,7 +82,7 @@ export function handleMarketEntered(event: MarketEnteredEvent): void {
         user.save();
     }
 
-    const userMarketId = market.id + user.id;
+    const userMarketId = market.id + user.id.toHexString();
 
     let userMarket = UserMarket.load(userMarketId);
 
@@ -112,7 +105,7 @@ export function handleMarketExited(event: MarketExitedEvent): void {
     const blockNumber = event.block.number;
 
     const market = Market.load(marketAddress.toHexString());
-    let user = User.load(userAddress.toHexString());
+    let user = User.load(userAddress);
 
     if (market == null) {
         // Won't happen
@@ -126,7 +119,7 @@ export function handleMarketExited(event: MarketExitedEvent): void {
         user.save();
     }
 
-    const userMarketId = market.id + user.id;
+    const userMarketId = market.id + user.id.toHexString();
 
     let userMarket = UserMarket.load(userMarketId);
 
