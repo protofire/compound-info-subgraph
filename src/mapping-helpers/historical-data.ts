@@ -13,7 +13,7 @@ import { SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_WEEK, ZERO_BD, ZERO_BI, ONE_BD, PROT
 
 export function updateMarketHourData(event: ethereum.Event): void {
     const marketAddress = event.address;
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         log.warning("*** ERROR: market was null in updateMarketHourData()", []);
@@ -150,7 +150,7 @@ export function updateMarketHourData(event: ethereum.Event): void {
 // Use market object to populate all these
 export function updateMarketDayData(event: ethereum.Event): void {
     const marketAddress = event.address;
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         log.warning("*** ERROR: market was null in updateMarketDayData()", []);
@@ -281,7 +281,7 @@ export function updateMarketDayData(event: ethereum.Event): void {
 
 export function updateMarketWeekData(event: ethereum.Event): void {
     const marketAddress = event.address;
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         log.warning("*** ERROR: market was null in updateMarketWeekData()", []);

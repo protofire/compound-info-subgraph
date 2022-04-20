@@ -79,7 +79,7 @@ export function handleMint(event: MintEvent): void {
     const marketAddress = event.address;
     const blockNumber = event.block.number;
 
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         // Won't happen
@@ -114,7 +114,7 @@ export function handleRedeem(event: RedeemEvent): void {
     const marketAddress = event.address;
     const blockNumber = event.block.number;
 
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         // Won't happen
@@ -148,7 +148,7 @@ export function handleBorrow(event: BorrowEvent): void {
     const marketAddress = event.address;
     const blockNumber = event.block.number;
 
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         // Won't happen
@@ -181,7 +181,7 @@ export function handleRepayBorrow(event: RepayBorrowEvent): void {
     const marketAddress = event.address;
     const blockNumber = event.block.number;
 
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         // Won't happen
@@ -220,8 +220,8 @@ export function handleLiquidateBorrow(event: LiquidateBorrowEvent): void {
     const seizeMarketAddress = event.params.cTokenCollateral;
     const blockNumber = event.block.number;
 
-    const seizeMarket = Market.load(seizeMarketAddress);
-    const liquidationMarket = Market.load(liquidationMarketAddress);
+    const seizeMarket = Market.load(seizeMarketAddress.toHexString());
+    const liquidationMarket = Market.load(liquidationMarketAddress.toHexString());
 
     if (liquidationMarket == null || seizeMarket == null) {
         // Won't happen
@@ -278,7 +278,7 @@ export function handleTransfer(event: TransferEvent): void {
         return;
     }
 
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
 
     if (market == null) {
         // Won't happen

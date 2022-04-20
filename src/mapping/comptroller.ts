@@ -67,7 +67,7 @@ export function handleMarketEntered(event: MarketEnteredEvent): void {
     const userAddress = event.params.account;
     const blockNumber = event.block.number;
 
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
     let user = User.load(userAddress);
 
     if (market == null) {
@@ -82,7 +82,7 @@ export function handleMarketEntered(event: MarketEnteredEvent): void {
         user.save();
     }
 
-    const userMarketId = market.id.toHexString() + user.id.toHexString();
+    const userMarketId = market.id + user.id.toHexString();
 
     let userMarket = UserMarket.load(userMarketId);
 
@@ -104,7 +104,7 @@ export function handleMarketExited(event: MarketExitedEvent): void {
     const userAddress = event.params.account;
     const blockNumber = event.block.number;
 
-    const market = Market.load(marketAddress);
+    const market = Market.load(marketAddress.toHexString());
     let user = User.load(userAddress);
 
     if (market == null) {
@@ -119,7 +119,7 @@ export function handleMarketExited(event: MarketExitedEvent): void {
         user.save();
     }
 
-    const userMarketId = market.id.toHexString() + user.id.toHexString();
+    const userMarketId = market.id + user.id.toHexString();
 
     let userMarket = UserMarket.load(userMarketId);
 

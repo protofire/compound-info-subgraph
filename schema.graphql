@@ -25,7 +25,7 @@ type Protocol @entity {
 
 type Market @entity {
     "cToken address"
-    id: Bytes!
+    id: ID!
     "block number when the market was created"
     creationBlockNumber: BigInt!
     "most recent block number where the market was updated"
