@@ -1,13 +1,6 @@
-import { BigInt, BigDecimal, ethereum } from "@graphprotocol/graph-ts";
+import { BigInt, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 
-import {
-    ZERO_BI,
-    ONE_BI,
-    ZERO_BD,
-    ONE_BD,
-    BLOCKS_PER_DAY,
-    DAYS_PER_YEAR,
-} from "./constants";
+import { ZERO_BI, ONE_BI, ZERO_BD, ONE_BD, BLOCKS_PER_DAY, DAYS_PER_YEAR } from "./constants";
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
     let bd = BigDecimal.fromString("1");
@@ -17,10 +10,7 @@ export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
     return bd;
 }
 
-export function tokenAmountToDecimal(
-    tokenAmount: BigInt,
-    decimals: BigInt
-): BigDecimal {
+export function tokenAmountToDecimal(tokenAmount: BigInt, decimals: BigInt): BigDecimal {
     if (ZERO_BI == decimals) {
         return tokenAmount.toBigDecimal();
     } else {
@@ -43,15 +33,28 @@ export function calculateCompDistrubtionApy(
     totalSupplyOrBorrow: BigDecimal,
     compSpeed: BigDecimal,
     usdcPerComp: BigDecimal,
-    usdcPerUnderlying: BigDecimal
+    usdcPerUnderlying: BigDecimal,
+    blockNumber: BigInt
 ): BigDecimal {
+    // log.warning("COMP APY - tsb: {}, speed: {}, usdcPerComd: {}, usdcPerUnderly: {}, block: {}", [
+    //     totalSupplyOrBorrow.toString(),
+    //     compSpeed.toString(),
+    //     usdcPerComp.toString(),
+    //     usdcPerUnderlying.toString(),
+    //     blockNumber.toString(),
+    // ]);
+
+    // TEMP: ride through block 15209048 insane usdcPerComp
+    if (usdcPerComp.gt(BigDecimal.fromString("1000000000000000000"))) {
+        log.warning("usdcPerComp ERROR: {}", [usdcPerComp.toString()]);
+        return ZERO_BD;
+    }
+
     const compDistributionPerDay = compSpeed.times(BLOCKS_PER_DAY);
 
     const denom = totalSupplyOrBorrow.times(usdcPerUnderlying);
 
-    const base = denom.notEqual(ZERO_BD)
-        ? ONE_BD.plus(usdcPerComp.times(compDistributionPerDay).div(denom))
-        : ZERO_BD;
+    const base = denom.notEqual(ZERO_BD) ? ONE_BD.plus(usdcPerComp.times(compDistributionPerDay).div(denom)) : ZERO_BD;
 
     let apy = BigDecimal.fromString("1");
     for (let i = ZERO_BI; i.lt(DAYS_PER_YEAR); i = i.plus(ONE_BI)) {

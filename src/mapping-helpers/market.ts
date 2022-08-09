@@ -75,7 +75,7 @@ export function createMarket(marketAddress: Address, blockNumber: BigInt): Marke
     market.cash = ZERO_BD;
     market.underlyingPerCToken = ZERO_BD;
     market.supplyRatePerBlock = ZERO_BD;
-    market.supplyRatePerBlock = ZERO_BD;
+    market.borrowRatePerBlock = ZERO_BD;
     market.supplyApy = ZERO_BD;
     market.borrowApy = ZERO_BD;
     market.totalSupplyApy = ZERO_BD;
@@ -230,14 +230,16 @@ export function updateMarket(marketAddress: Address, blockNumber: BigInt): void 
             market.totalSupply,
             market.compSpeedSupply,
             market.usdcPerComp,
-            market.usdcPerUnderlying
+            market.usdcPerUnderlying,
+            blockNumber
         );
 
         const compBorrowApy = calculateCompDistrubtionApy(
             market.totalBorrow,
             market.compSpeedBorrow,
             market.usdcPerComp,
-            market.usdcPerUnderlying
+            market.usdcPerUnderlying,
+            blockNumber
         );
 
         market.totalSupplyApy = market.supplyApy.plus(compSupplyApy);

@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
     file: ./schema.graphql
 dataSources:
@@ -95,6 +95,8 @@ templates:
                 handler: handleAccrueInterestOld
               - event: AccrueInterest(uint256,uint256,uint256,uint256)
                 handler: handleAccrueInterest
-# graft:
-#     base: QmPduDAv1S7UB48bNJvuFB4BaJJKiVmvVQgeSjPkoQ7PXf
-#     block: 13098860
+features:
+    - grafting
+graft:
+    base: QmQCH1zo9JPFhqEJSHUziWu3TtDFHWWAB4bNdBwhm2ua14
+    block: 15302452

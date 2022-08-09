@@ -44,10 +44,10 @@ type Market @entity {
     underlyingDecimals: BigInt!
     "comptroller address"
     comptrollerAddress: Bytes!
-    "total number of unique suppliers to the market"
-    numberOfSuppliers: BigInt!
-    "total number of unique borrowers to the market"
-    numberOfBorrowers: BigInt!
+    # "total number of unique suppliers to the market"
+    # numberOfSuppliers: BigInt!
+    # "total number of unique borrowers to the market"
+    # numberOfBorrowers: BigInt!
     "list of all UserMarket positions that belong to this market"
     userMarkets: [UserMarket!]! @derivedFrom(field: "market")
 

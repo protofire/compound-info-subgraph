@@ -46,6 +46,16 @@ export function getUsdcPerUnderlying(
     blockNumber: BigInt,
     usdcPerEth: BigDecimal
 ): BigDecimal {
+    // log.warning(
+    //     "getUsdcPerUnderlying - underlyingAddress: {}, cTokenAddress: {}, underlyingDecimals: {}, blockNumber: {}, usdcPerEth: {}",
+    //     [
+    //         underlyingAddress.toHexString(),
+    //         cTokenAddress.toString(),
+    //         underlyingDecimals.toString(),
+    //         blockNumber.toString(),
+    //         usdcPerEth.toString(),
+    //     ]
+    // );
     let usdcPerUnderlying: BigDecimal;
     if (blockNumber.lt(PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER)) {
         usdcPerUnderlying = getUsdcPerUnderlyingFromOracleOne(underlyingAddress, usdcPerEth);
@@ -137,7 +147,21 @@ function getUsdcPerUnderlyingAfterOracleOne(
             usdcPerUnderlyingScaled.value,
             BigInt.fromU32(36).minus(underlyingDecimals)
         );
+
+        log.warning("HERE - usdcPerUnderlyingScaled: {}", [usdcPerUnderlyingScaled.value.toString()]);
     }
+
+    // log.warning(
+    //     "getUsdcPerUnderlyingAfterOracleOne - cTokenAddress: {}, underlyingDecimals: {}, blockNumber: {}, usdcPerEth: {}, usdcPerUnderlying: {}, oracleAddr: {}",
+    //     [
+    //         cTokenAddress.toHexString(),
+    //         underlyingDecimals.toString(),
+    //         blockNumber.toString(),
+    //         usdcPerEth.toString(),
+    //         usdcPerUnderlying.toString(),
+    //         oracleAddress.toHexString(),
+    //     ]
+    // );
 
     return usdcPerUnderlying;
 }

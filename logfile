@@ -1,0 +1,154 @@
+2022-07-31 13:26:47.839 PDT [1507] LOG:  starting PostgreSQL 14.4 on x86_64-apple-darwin20.6.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit
+2022-07-31 13:26:47.839 PDT [1507] LOG:  could not bind IPv6 address "::1": Address already in use
+2022-07-31 13:26:47.839 PDT [1507] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:26:47.839 PDT [1507] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2022-07-31 13:26:47.839 PDT [1507] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:26:47.839 PDT [1507] WARNING:  could not create listen socket for "localhost"
+2022-07-31 13:26:47.839 PDT [1507] FATAL:  could not create any TCP/IP sockets
+2022-07-31 13:26:47.840 PDT [1507] LOG:  database system is shut down
+2022-07-31 13:27:46.849 PDT [1835] LOG:  starting PostgreSQL 14.4 on x86_64-apple-darwin20.6.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit
+2022-07-31 13:27:46.849 PDT [1835] LOG:  could not bind IPv6 address "::1": Address already in use
+2022-07-31 13:27:46.849 PDT [1835] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:27:46.849 PDT [1835] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2022-07-31 13:27:46.849 PDT [1835] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:27:46.849 PDT [1835] WARNING:  could not create listen socket for "localhost"
+2022-07-31 13:27:46.849 PDT [1835] FATAL:  could not create any TCP/IP sockets
+2022-07-31 13:27:46.850 PDT [1835] LOG:  database system is shut down
+2022-07-31 13:28:32.799 PDT [2075] LOG:  starting PostgreSQL 14.4 on x86_64-apple-darwin20.6.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit
+2022-07-31 13:28:32.800 PDT [2075] LOG:  could not bind IPv6 address "::1": Address already in use
+2022-07-31 13:28:32.800 PDT [2075] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:28:32.800 PDT [2075] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2022-07-31 13:28:32.800 PDT [2075] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:28:32.800 PDT [2075] WARNING:  could not create listen socket for "localhost"
+2022-07-31 13:28:32.800 PDT [2075] FATAL:  could not create any TCP/IP sockets
+2022-07-31 13:28:32.800 PDT [2075] LOG:  database system is shut down
+2022-07-31 13:31:42.213 PDT [2785] LOG:  starting PostgreSQL 14.4 on x86_64-apple-darwin20.6.0, compiled by Apple clang version 12.0.0 (clang-1200.0.32.29), 64-bit
+2022-07-31 13:31:42.214 PDT [2785] LOG:  could not bind IPv6 address "::1": Address already in use
+2022-07-31 13:31:42.214 PDT [2785] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:31:42.215 PDT [2785] LOG:  could not bind IPv4 address "127.0.0.1": Address already in use
+2022-07-31 13:31:42.215 PDT [2785] HINT:  Is another postmaster already running on port 5432? If not, wait a few seconds and retry.
+2022-07-31 13:31:42.215 PDT [2785] WARNING:  could not create listen socket for "localhost"
+2022-07-31 13:31:42.215 PDT [2785] FATAL:  could not create any TCP/IP sockets
+2022-07-31 13:31:42.215 PDT [2785] LOG:  database system is shut down
+2022-07-31 13:47:02.202 PDT [12853] LOG:  starting PostgreSQL 14.4 on aarch64-apple-darwin21.5.0, compiled by Apple clang version 13.1.6 (clang-1316.0.21.2.5), 64-bit
+2022-07-31 13:47:02.204 PDT [12853] LOG:  listening on IPv6 address "::1", port 5432
+2022-07-31 13:47:02.204 PDT [12853] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2022-07-31 13:47:02.205 PDT [12853] LOG:  listening on Unix socket "/tmp/.s.PGSQL.5432"
+2022-07-31 13:47:02.208 PDT [12854] LOG:  database system was shut down at 2022-07-31 13:46:57 PDT
+2022-07-31 13:47:02.210 PDT [12853] LOG:  database system is ready to accept connections
+2022-07-31 14:09:36.066 PDT [25931] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.105 PDT [25934] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.105 PDT [25935] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.105 PDT [25932] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.106 PDT [25933] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.107 PDT [25938] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.107 PDT [25939] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.108 PDT [25940] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.108 PDT [25941] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.109 PDT [25942] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.109 PDT [25943] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.110 PDT [25944] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.512 PDT [25950] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.512 PDT [25949] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.512 PDT [25951] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.513 PDT [25953] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.516 PDT [25954] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.516 PDT [25955] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.516 PDT [25956] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.518 PDT [25957] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.519 PDT [25959] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.519 PDT [25958] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:36.520 PDT [25960] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.107 PDT [25961] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.325 PDT [25962] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.326 PDT [25963] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.327 PDT [25965] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.327 PDT [25964] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.331 PDT [25967] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.331 PDT [25968] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.332 PDT [25969] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.334 PDT [25970] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.334 PDT [25971] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.334 PDT [25972] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:37.337 PDT [25973] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.934 PDT [25992] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.934 PDT [25993] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.934 PDT [25994] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.936 PDT [25995] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.936 PDT [25996] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.938 PDT [25997] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.938 PDT [25998] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.938 PDT [25999] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.940 PDT [26000] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.940 PDT [26001] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:38.940 PDT [26002] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:41.112 PDT [26026] FATAL:  role "spperkins" does not exist
+2022-07-31 14:09:42.144 PDT [26031] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.227 PDT [26719] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.253 PDT [26724] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.253 PDT [26723] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.253 PDT [26721] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.254 PDT [26720] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.258 PDT [26725] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.258 PDT [26726] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.258 PDT [26727] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.260 PDT [26728] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.260 PDT [26729] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.260 PDT [26730] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.262 PDT [26731] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.668 PDT [26732] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.669 PDT [26733] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.672 PDT [26734] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.673 PDT [26735] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.673 PDT [26736] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.674 PDT [26737] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.675 PDT [26738] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.676 PDT [26739] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.676 PDT [26740] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.678 PDT [26741] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:31.678 PDT [26742] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.265 PDT [26743] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.474 PDT [26744] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.474 PDT [26745] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.477 PDT [26746] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.478 PDT [26747] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.478 PDT [26748] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.479 PDT [26749] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.483 PDT [26750] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.483 PDT [26751] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.483 PDT [26752] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.484 PDT [26753] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:32.484 PDT [26754] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.089 PDT [26772] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.097 PDT [26774] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.097 PDT [26773] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.097 PDT [26775] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.098 PDT [26776] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.100 PDT [26777] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.101 PDT [26778] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.101 PDT [26779] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.108 PDT [26780] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.108 PDT [26781] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:34.108 PDT [26782] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.274 PDT [26783] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.601 PDT [26784] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.602 PDT [26785] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.603 PDT [26786] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.604 PDT [26787] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.607 PDT [26788] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.608 PDT [26789] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.608 PDT [26790] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.611 PDT [26791] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.611 PDT [26792] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.612 PDT [26793] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:36.615 PDT [26794] FATAL:  role "spperkins" does not exist
+2022-07-31 14:12:37.320 PDT [26795] FATAL:  role "spperkins" does not exist
+2022-07-31 14:14:17.042 PDT [27225] ERROR:  database "graph-node" already exists
+2022-07-31 14:14:17.042 PDT [27225] STATEMENT:  CREATE DATABASE "graph-node";
+2022-07-31 14:22:02.312 PDT [12859] LOG:  could not open temporary statistics file "pg_stat_tmp/global.tmp": No such file or directory
+2022-07-31 14:22:02.340 PDT [12853] LOG:  could not open file "postmaster.pid": No such file or directory
+2022-07-31 14:22:02.340 PDT [12853] LOG:  performing immediate shutdown because data directory lock file is invalid
+2022-07-31 14:22:02.340 PDT [12853] LOG:  received immediate shutdown request
+2022-07-31 14:22:02.340 PDT [12853] LOG:  could not open file "postmaster.pid": No such file or directory
+2022-07-31 14:22:02.343 PDT [12859] LOG:  could not open temporary statistics file "pg_stat/global.tmp": No such file or directory
+2022-07-31 14:22:02.345 PDT [12853] LOG:  database system is shut down

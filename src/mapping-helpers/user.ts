@@ -8,6 +8,9 @@ export function createUser(address: Address, blockNumber: BigInt): User {
 
     user.creationBlockNumber = blockNumber;
     user.lastBlockNumber = blockNumber;
+    user.userMarkets = new Array<string>();
+    user.totalSupplyUsd = ZERO_BD;
+    user.totalBorrowUsd = ZERO_BD;
 
     user.save();
     return user;

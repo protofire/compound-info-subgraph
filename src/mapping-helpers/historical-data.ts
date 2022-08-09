@@ -30,6 +30,7 @@ export function updateMarketHourData(event: ethereum.Event): void {
     if (marketData == null) {
         // Make a new one for this ID
         marketData = new MarketHourData(hourDataId);
+
         marketData.market = market.id;
         marketData.date = hourStartTimestamp;
 
@@ -52,9 +53,14 @@ export function updateMarketHourData(event: ethereum.Event): void {
         marketData.totalBorrowUsd = ZERO_BD;
         marketData.totalReserves = ZERO_BD;
         marketData.totalReservesUsd = ZERO_BD;
+        marketData.availableLiquidity = ZERO_BD;
+        marketData.availableLiquidityUsd = ZERO_BD;
         marketData.utilization = ZERO_BD;
+        marketData.compSpeedSupply = ZERO_BD;
+        marketData.compSpeedBorrow = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
+        marketData.usdcPerComp = ZERO_BD;
 
         marketData.txCount = ZERO_BI;
     }
@@ -178,6 +184,7 @@ export function updateMarketDayData(event: ethereum.Event): void {
         marketData.underlyingPerCToken = ZERO_BD;
         marketData.supplyRatePerBlock = ZERO_BD;
         marketData.borrowRatePerBlock = ZERO_BD;
+
         marketData.supplyApy = ZERO_BD;
         marketData.borrowApy = ZERO_BD;
         marketData.totalSupplyApy = ZERO_BD;
@@ -188,9 +195,14 @@ export function updateMarketDayData(event: ethereum.Event): void {
         marketData.totalBorrowUsd = ZERO_BD;
         marketData.totalReserves = ZERO_BD;
         marketData.totalReservesUsd = ZERO_BD;
+        marketData.availableLiquidity = ZERO_BD;
+        marketData.availableLiquidityUsd = ZERO_BD;
         marketData.utilization = ZERO_BD;
+        marketData.compSpeedSupply = ZERO_BD;
+        marketData.compSpeedBorrow = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
+        marketData.usdcPerComp = ZERO_BD;
 
         marketData.txCount = ZERO_BI;
     }
@@ -309,6 +321,7 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         marketData.underlyingPerCToken = ZERO_BD;
         marketData.supplyRatePerBlock = ZERO_BD;
         marketData.borrowRatePerBlock = ZERO_BD;
+
         marketData.supplyApy = ZERO_BD;
         marketData.borrowApy = ZERO_BD;
         marketData.totalSupplyApy = ZERO_BD;
@@ -319,9 +332,14 @@ export function updateMarketWeekData(event: ethereum.Event): void {
         marketData.totalBorrowUsd = ZERO_BD;
         marketData.totalReserves = ZERO_BD;
         marketData.totalReservesUsd = ZERO_BD;
+        marketData.availableLiquidity = ZERO_BD;
+        marketData.availableLiquidityUsd = ZERO_BD;
         marketData.utilization = ZERO_BD;
+        marketData.compSpeedSupply = ZERO_BD;
+        marketData.compSpeedBorrow = ZERO_BD;
         marketData.usdcPerUnderlying = ZERO_BD;
         marketData.usdcPerEth = ZERO_BD;
+        marketData.usdcPerComp = ZERO_BD;
 
         marketData.txCount = ZERO_BI;
     }
@@ -425,7 +443,7 @@ export function updateProtocolWeekData(event: ethereum.Event): void {
     const weekDataId = weekId.toString() + "-" + protocol.id;
 
     let protocolData = ProtocolWeekData.load(weekDataId);
-    if (protocolData == null) {
+    if (!protocolData) {
         // Make a new one for this ID
         protocolData = new ProtocolWeekData(weekDataId);
         protocolData.protocol = PROTOCOL_ID;

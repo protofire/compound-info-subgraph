@@ -26,7 +26,9 @@ export function createUserMarket(userAddress: Address, marketAddress: Address, b
     userMarket.latestBlockNumber = blockNumber;
     userMarket.enteredMarket = false;
     userMarket.totalSupply = ZERO_BD;
+    userMarket.totalSupplyUsd = ZERO_BD;
     userMarket.totalBorrow = ZERO_BD;
+    userMarket.totalBorrowUsd = ZERO_BD;
     userMarket.cTokenBalance = ZERO_BD;
 
     // Add the userMarket to the list of userMarkets for the user
