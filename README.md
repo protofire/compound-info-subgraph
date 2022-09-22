@@ -1,4 +1,4 @@
-# [Compound Info Subgraph](https://thegraph.com/hosted-service/subgraph/papercliplabs/compound-info)
+# [Compound Info Subgraph](https://thegraph.com/explorer/subgraph?id=AcQLRyJfoDLzTAMMdR6wVE5WCowMLVP8uGkoLvZmxmAv&view=Overview)
 
 This is the data source for [Compound Info](https://compoundfinance.info)
 
