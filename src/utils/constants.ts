@@ -21,14 +21,19 @@ export const PROTOCOL_ID = "1";
 export const SEC_PER_HOUR = BigInt.fromU32(3600);
 export const SEC_PER_DAY = BigInt.fromU32(86400);
 export const SEC_PER_WEEK = BigInt.fromU32(604800);
+export const DAYS_PER_YEAR = BigInt.fromU32(365);
 
 export const PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER = BigInt.fromU32(7715908);
 export const GET_PRICE_UNDERLYING_CHANGES_FROM_ETH_TO_USDC_BASE_BLOCK_NUMBER = BigInt.fromU32(10678764);
 export const COMP_SPEED_SPLIT_BLOCK_NUMBER = BigInt.fromU32(13322798);
+export const MERGE_BLOCK_NUMBER = BigInt.fromU32(15537393);
 
-export const SEC_PER_BLOCK = BigDecimal.fromString("13.5");
-export const DAYS_PER_YEAR = BigInt.fromU32(365);
+// Pre-Merge block timing
+export const SEC_PER_BLOCK_PRE_MERGE = BigDecimal.fromString("13.5"); // Average over life of Compound pre-merge
+export const BLOCK_PER_SEC_PRE_MERGE = BigDecimal.fromString("1").div(SEC_PER_BLOCK_PRE_MERGE);
+export const BLOCKS_PER_DAY_PRE_MERGE = BLOCK_PER_SEC_PRE_MERGE.times(SEC_PER_DAY.toBigDecimal());
 
-// Derived
-export const BLOCK_PER_SEC = BigDecimal.fromString("1").div(SEC_PER_BLOCK);
-export const BLOCKS_PER_DAY = BLOCK_PER_SEC.times(SEC_PER_DAY.toBigDecimal());
+// Post-Merge block timing
+export const SEC_PER_BLOCK_POST_MERGE = BigDecimal.fromString("12");
+export const BLOCK_PER_SEC_POST_MERGE = BigDecimal.fromString("1").div(SEC_PER_BLOCK_POST_MERGE);
+export const BLOCKS_PER_DAY_POST_MERGE = BLOCK_PER_SEC_POST_MERGE.times(SEC_PER_DAY.toBigDecimal());

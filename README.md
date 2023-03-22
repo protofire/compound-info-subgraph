@@ -15,10 +15,18 @@ yarn
 graph codegen
 ```
 
-###### Deploy changes
+###### Deploy changes to hosted service
 
 ```bash
 graph deploy --product hosted-service papercliplabs/compound-info --deploy-key <DEPLOY_KEY>
+```
+
+###### Deploy changes to studio (decentralized)
+
+Deploy and publish are 2 different steps
+
+```bash
+graph deploy --studio compound-info --deploy-key <DEPLOY_KEY>
 ```
 
 Note: the DEPLOY_KEY can be found on the graph page if logged in, otherwise ask @spennyp

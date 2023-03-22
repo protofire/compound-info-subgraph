@@ -174,8 +174,8 @@ export function updateMarket(marketAddress: Address, blockNumber: BigInt): void 
         // Remove 10^18 that scales this value
         market.borrowRatePerBlock = tokenAmountToDecimal(contract.borrowRatePerBlock(), BigInt.fromU32(18));
 
-        market.supplyApy = calculateApy(market.supplyRatePerBlock);
-        market.borrowApy = calculateApy(market.borrowRatePerBlock);
+        market.supplyApy = calculateApy(market.supplyRatePerBlock, blockNumber);
+        market.borrowApy = calculateApy(market.borrowRatePerBlock, blockNumber);
 
         market.reserveFactor = tokenAmountToDecimal(contract.reserveFactorMantissa(), BigInt.fromU32(18));
 

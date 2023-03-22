@@ -1,6 +1,15 @@
 import { BigInt, BigDecimal, ethereum, log } from "@graphprotocol/graph-ts";
 
-import { ZERO_BI, ONE_BI, ZERO_BD, ONE_BD, BLOCKS_PER_DAY, DAYS_PER_YEAR } from "./constants";
+import {
+    ZERO_BI,
+    ONE_BI,
+    ZERO_BD,
+    ONE_BD,
+    BLOCKS_PER_DAY_PRE_MERGE,
+    DAYS_PER_YEAR,
+    MERGE_BLOCK_NUMBER,
+    BLOCKS_PER_DAY_POST_MERGE,
+} from "./constants";
 
 export function exponentToBigDecimal(decimals: BigInt): BigDecimal {
     let bd = BigDecimal.fromString("1");
@@ -18,8 +27,8 @@ export function tokenAmountToDecimal(tokenAmount: BigInt, decimals: BigInt): Big
     }
 }
 
-export function calculateApy(ratePerBlock: BigDecimal): BigDecimal {
-    const base = ratePerBlock.times(BLOCKS_PER_DAY).plus(ONE_BD);
+export function calculateApy(ratePerBlock: BigDecimal, blockNumber: BigInt): BigDecimal {
+    const base = ratePerBlock.times(getBlocksPerData(blockNumber)).plus(ONE_BD);
 
     let apy = BigDecimal.fromString("1");
     for (let i = ZERO_BI; i.lt(DAYS_PER_YEAR); i = i.plus(ONE_BI)) {
@@ -50,7 +59,7 @@ export function calculateCompDistrubtionApy(
         return ZERO_BD;
     }
 
-    const compDistributionPerDay = compSpeed.times(BLOCKS_PER_DAY);
+    const compDistributionPerDay = compSpeed.times(getBlocksPerData(blockNumber));
 
     const denom = totalSupplyOrBorrow.times(usdcPerUnderlying);
 
@@ -77,4 +86,8 @@ export function maxBigDecimal(a: BigDecimal, b: BigDecimal): BigDecimal {
     } else {
         return b;
     }
+}
+
+export function getBlocksPerData(currentBlockNumber: BigInt): BigDecimal {
+    return currentBlockNumber.lt(MERGE_BLOCK_NUMBER) ? BLOCKS_PER_DAY_PRE_MERGE : BLOCKS_PER_DAY_POST_MERGE;
 }
