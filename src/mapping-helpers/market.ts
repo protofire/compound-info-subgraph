@@ -1,10 +1,10 @@
 import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 
 import { Market, Protocol } from "../../generated/schema";
-import { CToken } from "../../generated/templates/cToken/cToken";
-import { ERC20 } from "../../generated/templates/cToken/ERC20";
-import { CERC20 } from "../../generated/templates/cToken/CERC20";
-import { Comptroller } from "../../generated/comptroller/comptroller";
+import { CToken } from "../../generated/templates/CToken/CToken";
+import { ERC20 } from "../../generated/templates/CToken/ERC20";
+import { CERC20 } from "../../generated/templates/CToken/CERC20";
+import { Comptroller } from "../../generated/Comptroller/Comptroller";
 
 import {
     ETH_ADDRESS,
@@ -18,7 +18,7 @@ import {
     LEGACY_CWBTC_ADDRESS,
 } from "../utils/constants";
 import { getUsdcPerEth, getUsdcPerUnderlying } from "./oracle";
-import { tokenAmountToDecimal, calculateApy, calculateCompDistrubtionApy } from "../utils/utils";
+import { tokenAmountToDecimal, calculateApy } from "../utils/utils";
 
 /**
  * Helper function to create a new market. This populates all fields which won't change throughout the lifetime of the market
@@ -28,6 +28,7 @@ import { tokenAmountToDecimal, calculateApy, calculateCompDistrubtionApy } from 
  */
 export function createMarket(marketAddress: Address, blockNumber: BigInt): Market {
     log.info(`CREATING MARKET: ${marketAddress.toHexString()}`, []);
+    
 
     const contract = CToken.bind(marketAddress);
     const market = new Market(marketAddress.toHexString());
@@ -37,35 +38,23 @@ export function createMarket(marketAddress: Address, blockNumber: BigInt): Marke
     market.cTokenDecimals = BigInt.fromI32(contract.decimals());
     market.comptrollerAddress = contract.comptroller();
 
+
     if (CETH_ADDRESS == marketAddress.toHexString()) {
         // cETH has a different interface
-        market.underlyingName = "Ether";
-        market.underlyingSymbol = "ETH";
+        log.info(`NATIVE MARKET: ${marketAddress.toHexString()}`, []);
+        market.underlyingName = "ONE";
+        market.underlyingSymbol = "ONE";
         market.underlyingAddress = Address.fromString(ETH_ADDRESS);
         market.underlyingDecimals = BigInt.fromI32(18);
-    } else {
+    } 
+    else {
         // any other cToken besides cETH
         const cErc20Contract = CERC20.bind(marketAddress);
         const underlyingAddress = cErc20Contract.underlying();
         const underlyingContract = ERC20.bind(underlyingAddress);
-        market.underlyingAddress = underlyingAddress;
-
-        if (underlyingAddress.toHexString() == SAI_ADDRESS) {
-            // SAI contract returns garbage for name and symbol
-            market.underlyingName = "Sai Stablecoin v1.0 (SAI)";
-            market.underlyingSymbol = "SAI";
-        } else if (underlyingAddress.toHexString() == MKR_ADDRESS) {
-            // MKR contract returns garbage for name and symbol
-            market.underlyingName = "Maker token";
-            market.underlyingSymbol = "MKR";
-        } else if (marketAddress.toHexString() == LEGACY_CWBTC_ADDRESS) {
-            market.underlyingName = "Legacy WBTC";
-            market.underlyingSymbol = "WBTCL";
-        } else {
-            market.underlyingName = underlyingContract.name();
-            market.underlyingSymbol = underlyingContract.symbol();
-        }
-
+        market.underlyingAddress = underlyingAddress;       
+        market.underlyingName = underlyingContract.name();
+        market.underlyingSymbol = underlyingContract.symbol();
         market.underlyingDecimals = BigInt.fromI32(underlyingContract.decimals());
     }
 
@@ -132,13 +121,7 @@ export function updateMarket(marketAddress: Address, blockNumber: BigInt): void 
             market.usdcPerEth
         );
 
-        market.usdcPerComp = getUsdcPerUnderlying(
-            Address.fromString(COMP_ADDRESS),
-            Address.fromString(CCOMP_ADDRESS),
-            BigInt.fromU32(18),
-            blockNumber,
-            market.usdcPerEth
-        );
+        market.usdcPerComp = BigDecimal.fromString('0')
 
         // mantisa for this is 18 + underlying decimals - ctoken decimals, i.e the value is scaled by 10^18 in contract
         market.underlyingPerCToken = tokenAmountToDecimal(
@@ -226,21 +209,9 @@ export function updateMarket(marketAddress: Address, blockNumber: BigInt): void 
             }
         }
 
-        const compSupplyApy = calculateCompDistrubtionApy(
-            market.totalSupply,
-            market.compSpeedSupply,
-            market.usdcPerComp,
-            market.usdcPerUnderlying,
-            blockNumber
-        );
+        const compSupplyApy = BigDecimal.fromString('0')
 
-        const compBorrowApy = calculateCompDistrubtionApy(
-            market.totalBorrow,
-            market.compSpeedBorrow,
-            market.usdcPerComp,
-            market.usdcPerUnderlying,
-            blockNumber
-        );
+        const compBorrowApy = BigDecimal.fromString('0')
 
         market.totalSupplyApy = market.supplyApy.plus(compSupplyApy);
         market.totalBorrowApy = market.borrowApy.minus(compBorrowApy);

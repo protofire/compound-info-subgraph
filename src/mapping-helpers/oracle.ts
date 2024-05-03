@@ -1,8 +1,8 @@
 import { Address, BigDecimal, BigInt, log } from "@graphprotocol/graph-ts";
 
 import { Protocol } from "../../generated/schema";
-import { PriceOracle1 } from "../../generated/templates/cToken/PriceOracle1";
-import { PriceOracle2 } from "../../generated/templates/cToken/PriceOracle2";
+import { PriceOracle1 } from "../../generated/templates/CToken/PriceOracle1";
+import { PriceOracle2 } from "../../generated/templates/CToken/PriceOracle2";
 
 import { ZERO_BD, ONE_BD } from "../utils/constants";
 import {

@@ -59,7 +59,7 @@ export function calculateCompDistrubtionApy(
         return ZERO_BD;
     }
 
-    const compDistributionPerDay = compSpeed.times(getBlocksPerData(blockNumber));
+    const compDistributionPerDay = BigDecimal.fromString('0')
 
     const denom = totalSupplyOrBorrow.times(usdcPerUnderlying);
 

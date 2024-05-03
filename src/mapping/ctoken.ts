@@ -10,7 +10,7 @@ import {
     AccrueInterest as AccrueInterestEvent,
     NewReserveFactor as NewReserveFactorEvent,
     Transfer as TransferEvent,
-} from "../../generated/templates/cToken/cToken";
+} from "../../generated/templates/CToken/CToken";
 
 import {
     Market,

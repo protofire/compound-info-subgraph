@@ -4,14 +4,14 @@ schema:
 dataSources:
     - kind: ethereum/contract
       name: Comptroller
-      network: mainnet
+      network: harmony
       source:
-          address: "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
+          address: "0xC5D46109ec064E1aFa9829a457Db4a9e98fe472b"
           abi: Comptroller
-          startBlock: 7700000
+          startBlock: 53149709
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.5
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           file: ./src/mapping/comptroller.ts
           entities:
@@ -44,12 +44,12 @@ dataSources:
 templates:
     - name: CToken
       kind: ethereum/contract
-      network: mainnet
+      network: harmony
       source:
           abi: CToken
       mapping:
           kind: ethereum/events
-          apiVersion: 0.0.5
+          apiVersion: 0.0.6
           language: wasm/assemblyscript
           file: ./src/mapping/ctoken.ts
           entities:
@@ -95,8 +95,3 @@ templates:
                 handler: handleAccrueInterestOld
               - event: AccrueInterest(uint256,uint256,uint256,uint256)
                 handler: handleAccrueInterest
-features:
-    - grafting
-graft:
-    base: QmdzmaeKuBroxvAdRrENGKyCAMvAresZuKXop5hqPvjYeA
-    block: 15537392

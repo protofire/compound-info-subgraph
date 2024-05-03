@@ -5,7 +5,7 @@ import {
     NewPriceOracle as NewPriceOracleEvent,
     MarketEntered as MarketEnteredEvent,
     MarketExited as MarketExitedEvent,
-} from "../../generated/comptroller/comptroller";
+} from "../../generated/Comptroller/Comptroller";
 import { Market, Protocol, User, UserMarket } from "../../generated/schema";
 import { CToken as CTokenTemplate } from "../../generated/templates";
 
@@ -13,7 +13,7 @@ import { createMarket } from "../mapping-helpers/market";
 import { createProtocol } from "../mapping-helpers/protocol";
 import { createUser } from "../mapping-helpers/user";
 import { createUserMarket } from "../mapping-helpers/userMarket";
-import { PROTOCOL_ID, PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER, PRICE_ORACLE_1_ADDRESS } from "../utils/constants";
+import { PROTOCOL_ID } from "../utils/constants";
 
 export function handleMarketListed(event: MarketListedEvent): void {
     const cTokenAddress = event.params.cToken;
@@ -26,11 +26,7 @@ export function handleMarketListed(event: MarketListedEvent): void {
     // It will already exist
     let protocol = Protocol.load(PROTOCOL_ID);
     if (protocol == null) {
-        let oracleAddress = PRICE_ORACLE_1_ADDRESS;
-        if (event.block.number.gt(PRICE_ORACLE_1_CHANGED_TO_2_BLOCK_NUMBER)) {
-            oracleAddress = "0x6d2299c48a8dd07a872fdd0f8233924872ad1071 "; // hard coded price oracle 2 address
-        }
-
+        const oracleAddress = "0x23658D27fCa1fc6BEF59e433eD476c56C13D99fa "; // hard coded price oracle 2 address
         protocol = createProtocol(Address.fromString(oracleAddress), blockNumber);
     }
 

@@ -1,7 +1,7 @@
 import { Address, BigInt, BigDecimal, log } from "@graphprotocol/graph-ts";
 
 import { Market, User, UserMarket } from "../../generated/schema";
-import { CToken } from "../../generated/templates/cToken/cToken";
+import { CToken } from "../../generated/templates/CToken/CToken";
 import { ZERO_BD, ZERO_BI } from "../utils/constants";
 import { tokenAmountToDecimal } from "../utils/utils";
 import { createUser } from "./user";
